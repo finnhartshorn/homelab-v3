@@ -22,6 +22,9 @@ spec:
     remediation:
       retries: 3
   values:
+    monitoring:
+        enabled: true
+        createPrometheusRules: true
     persistence:
       defaultClass: true
       defaultClassReplicaCount: 3
