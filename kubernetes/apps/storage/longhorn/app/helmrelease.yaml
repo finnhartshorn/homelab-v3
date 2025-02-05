@@ -36,6 +36,7 @@ spec:
       ingressClassName: internal
       host: "longhorn.${SECRET_DOMAIN}"
       path: /
+      pathType: Prefix
       # app:
       #   className: internal
       #   hosts:
