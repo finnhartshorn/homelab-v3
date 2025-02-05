@@ -32,14 +32,17 @@ spec:
       recurringJobSelector:
         enable: false
     ingress:
-      app:
-        className: internal
-        hosts:
-          - host: &host "longhorn.${SECRET_DOMAIN}"
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
-        tls:
-          - hosts: [*host]
+      ingressClassName: internal
+      host: "longhorn.${SECRET_DOMAIN}"
+      path: /
+      # app:
+      #   className: internal
+      #   hosts:
+      #     - host: &host "longhorn.${SECRET_DOMAIN}"
+      #       paths:
+      #         - path: /
+      #           service:
+      #             identifier: app
+      #             port: http
+      #   tls:
+      #     - hosts: [*host]
