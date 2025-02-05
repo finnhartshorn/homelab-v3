@@ -32,7 +32,7 @@ spec:
       recurringJobSelector:
         enable: false
     ingress:
-      enable: true
+      enabled: true
       ingressClassName: internal
       host: "longhorn.${SECRET_DOMAIN}"
       path: /
