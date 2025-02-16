@@ -3,7 +3,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: pv-smb-radarr-downloads
-  namespace: plex-support
+  namespace: arr
 spec:
   capacity:
     storage: 100Gi
@@ -28,7 +28,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: pvc-smb-radarr-downloads
-  namespace: plex-support
+  namespace: arr
 spec:
   accessModes:
     - ReadWriteMany
@@ -42,7 +42,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: pv-smb-radarr-movies
-  namespace: plex-support
+  namespace: arr
 spec:
   capacity:
     storage: 100Gi
@@ -67,7 +67,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: pvc-smb-radarr-movies
-  namespace: plex-support
+  namespace: arr
 spec:
   accessModes:
     - ReadWriteMany
