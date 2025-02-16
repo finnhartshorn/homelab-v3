@@ -22,7 +22,7 @@ spec:
       source: "//${NFS_SERVER}/${NFS_DOWNLOADS}"
     nodeStageSecretRef:
       name: smbcreds
-      namespace: default
+      namespace: flux-system
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
@@ -61,7 +61,7 @@ spec:
       source: "//${NFS_SERVER}/${NFS_MOVIES}"
     nodeStageSecretRef:
       name: smbcreds
-      namespace: default
+      namespace: flux-system
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
