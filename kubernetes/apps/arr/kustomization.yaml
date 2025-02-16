@@ -5,7 +5,6 @@ kind: Kustomization
 resources:
   - ./prowlarr/ks.yaml
   - ./radarr/ks.yaml
-  - ./nfs-driver/ks.yaml
 components:
   - ../../flux/components/namespace
 patches:
