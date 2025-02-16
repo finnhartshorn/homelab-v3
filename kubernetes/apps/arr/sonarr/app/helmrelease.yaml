@@ -1,0 +1,74 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: sonarr
+  namespace: arr
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.1
+      interval: 15m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  # See https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/values.yaml
+  values:
+    controllers:
+      main:
+        containers:
+          app:
+            image:
+              repository: ghcr.io/onedr0p/sonarr
+              tag: 4.0.13.2932@sha256:004aa9dc8e670e28b3ee2dc65b3b850ea3bd5a45d3c5ce5068bc4d45583c1770
+            env:
+              TZ: "Australia/Melbourne"
+              SONARR__INSTANCE_NAME: Sonarr
+              SONARR__PORT: &port 8989
+              SONARR__APPLICATION_URL: "https://sonarr.${SECRET_DOMAIN}"
+              SONARR__LOG_LEVEL: info
+            resources:
+              requests:
+                memory: 250Mi
+                cpu: 500m
+              limits:
+                memory: 1500Mi
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            fsGroup: 568
+            fsGroupChangePolicy: "OnRootMismatch"
+    
+    persistence:
+      config:
+        storageClass: "longhorn"
+        accessMode: "ReadWriteOnce"
+        size: 1Gi
+      tv:
+        enabled: true
+        existingClaim: "pvc-smb-sonarr-tv"
+      downloads:
+        enabled: true
+        existingClaim: "pvc-smb-sonarr-downloads"
+    service:
+      main:
+        controller: main
+        ports:
+          http:
+            port: *port
+    ingress:
+      main:
+        enabled: true
+        hosts:
+        - host: "sonarr.${SECRET_DOMAIN}"
+          paths:
+          - path: /
+            pathType: Prefix
+            service:
+              identifier: main
+              port: http
