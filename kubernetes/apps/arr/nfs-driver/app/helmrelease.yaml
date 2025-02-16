@@ -14,7 +14,7 @@ spec:
       interval: 15m
       sourceRef:
         kind: HelmRepository
-        name: csi-drive-smb
+        name: csi-driver-smb
         namespace: flux-system
   # See https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/values.yaml
   values:

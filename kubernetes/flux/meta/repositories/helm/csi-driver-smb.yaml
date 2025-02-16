@@ -3,7 +3,7 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
-  name: csi-drive-smb
+  name: csi-driver-smb
   namespace: flux-system
 spec:
   interval: 1h
