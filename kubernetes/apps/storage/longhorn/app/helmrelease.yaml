@@ -37,14 +37,3 @@ spec:
       host: "longhorn.${SECRET_DOMAIN}"
       path: /
       pathType: Prefix
-      # app:
-      #   className: internal
-      #   hosts:
-      #     - host: &host "longhorn.${SECRET_DOMAIN}"
-      #       paths:
-      #         - path: /
-      #           service:
-      #             identifier: app
-      #             port: http
-      #   tls:
-      #     - hosts: [*host]
