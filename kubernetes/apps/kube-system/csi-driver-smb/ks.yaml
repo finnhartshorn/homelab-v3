@@ -6,11 +6,11 @@ metadata:
   name: &app csi-driver-smb
   namespace: flux-system
 spec:
-  targetNamespace: arr
+  targetNamespace: kube-system
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  path: ./kubernetes/apps/arr/csi-driver-smb/app
+  path: ./kubernetes/apps/kube-system/csi-driver-smb/app
   prune: true
   sourceRef:
     kind: GitRepository
