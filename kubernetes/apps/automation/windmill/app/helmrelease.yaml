@@ -1,0 +1,36 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: windmill
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: windmill
+      version: 1.8.0
+      sourceRef:
+        kind: HelmRepository
+        name: windmill
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    windmill:
+      baseDomain: "windmill.${SECRET_DOMAIN}"
+      app:
+        podSecurityContext:
+          runAsUser: 1000
+          runAsNonRoot: true
+    ingress:
+      enabled: true
+      ingressClassName: internal
+      host: "windmill.${SECRET_DOMAIN}"
+      path: /
+      pathType: Prefix
