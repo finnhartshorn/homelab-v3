@@ -29,6 +29,8 @@ spec:
       workerGroups:
         - name: "default"
           replicas: 1
+        - name: "native"
+          replicas: 1
       app:
         podSecurityContext:
           runAsUser: 1000
