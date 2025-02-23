@@ -42,6 +42,12 @@
       "matchUpdateTypes": ["minor", "patch"]
     },
     {
+      "description": ["Auto merge selected packages"],
+      "matchPackageNames": ["ghcr.io/onedr0p/prowlarr", "ghcr.io/onedr0p/sonarr", "ghcr.io/onedr0p/radarr", "ghcr.io/flaresolverr/flaresolverr"],
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true
+    },
+    {
       "description": ["Flux Operator Group"],
       "groupName": "Flux Operator",
       "matchPackagePatterns": ["flux-operator", "flux-instance"],
