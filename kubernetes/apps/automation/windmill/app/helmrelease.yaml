@@ -24,6 +24,11 @@ spec:
   values:
     windmill:
       baseDomain: "windmill.${SECRET_DOMAIN}"
+      appReplicas: 1
+      lspReplicas: 1
+      workerGroups:
+        - name: "default"
+          replicas: 1
       app:
         podSecurityContext:
           runAsUser: 1000
