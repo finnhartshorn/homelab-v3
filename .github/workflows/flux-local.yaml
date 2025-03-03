@@ -24,9 +24,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          repository: https://code.forgejo.org/forgejo-helm/forgejo-helm.git
+          repository: forgejo-helm/forgejo-helm
           ref: v3.0.0
           path: forgejo-helm
+          github-server-url: https://code.forgejo.org/
 
       - name: Run flux-local test
         uses: docker://ghcr.io/allenporter/flux-local:v7.0.0
