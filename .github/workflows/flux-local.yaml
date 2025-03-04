@@ -23,12 +23,12 @@ jobs:
 
       - name: Checkout forgejo
         run: |
-          git clone --depth 1 --branch v3.0.0 https://code.forgejo.org/forgejo-helm/forgejo-helm /github/workspace/forgejo-helm
+          git clone --depth 1 --branch v3.0.0 https://code.forgejo.org/forgejo-helm/forgejo-helm ./forgejo-helm
 
       - name: Run flux-local test
         uses: docker://ghcr.io/allenporter/flux-local:v7.0.0
         with:
-          args: test --enable-helm --all-namespaces --path /github/workspace/kubernetes/flux/cluster -v --sources forgejo=/github/workspace/forgejo-helm/ --sources flux-system
+          args: test --enable-helm --all-namespaces --path /github/workspace/kubernetes/flux/cluster -v --sources forgejo=c./forgejo-helm/ --sources flux-system
 
   diff:
     name: Flux Local Diff
