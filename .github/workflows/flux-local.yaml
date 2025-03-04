@@ -21,18 +21,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          repository: forgejo-helm/forgejo-helm
-          ref: v3.0.0
-          path: forgejo-helm
-          github-server-url: https://code.forgejo.org/
+      - name: Checkout forgejo
+        run: |
+          git clone --depth 1 --branch v3.0.0 https://code.forgejo.org/forgejo-helm/forgejo-helm /github/workspace/forgejo-helm
 
       - name: Run flux-local test
         uses: docker://ghcr.io/allenporter/flux-local:v7.0.0
         with:
-          args: test --enable-helm --all-namespaces --path /github/workspace/kubernetes/flux/cluster -v --sources forgejo=/github/workspace/forgejo-helm/forgejo-helm --sources flux-system
+          args: test --enable-helm --all-namespaces --path /github/workspace/kubernetes/flux/cluster -v --sources forgejo=/github/workspace/forgejo-helm/ --sources flux-system
 
   diff:
     name: Flux Local Diff
