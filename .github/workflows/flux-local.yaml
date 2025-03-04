@@ -28,7 +28,7 @@ jobs:
       - name: Run flux-local test
         uses: docker://ghcr.io/allenporter/flux-local:v7.0.0
         with:
-          args: test --enable-helm --all-namespaces --path /github/workspace/kubernetes/flux/cluster -v --sources forgejo=c./forgejo-helm/ --sources flux-system
+          args: test --enable-helm --all-namespaces --path /github/workspace/kubernetes/flux/cluster -v --sources forgejo=./forgejo-helm/ --sources flux-system
 
   diff:
     name: Flux Local Diff
