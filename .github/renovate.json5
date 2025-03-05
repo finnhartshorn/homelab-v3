@@ -76,6 +76,8 @@
         'ghcr.io/onedr0p/sonarr',
         'ghcr.io/onedr0p/radarr',
         'ghcr.io/flaresolverr/flaresolverr',
+        'windmill',
+        'docker.io/cloudflare/cloudflared',
       ],
       matchUpdateTypes: [
         'minor',
