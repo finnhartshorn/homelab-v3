@@ -10,9 +10,9 @@ spec:
   chart:
     spec:
       chart: .
-      version: v3.0.0
+      version: 3.0.0
       sourceRef:
-        kind: GitRepository
+        kind: OCIRepository
         name: forgejo
         namespace: flux-system
   install:
