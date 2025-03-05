@@ -8,4 +8,4 @@ spec:
   interval: 5m0s
   url: oci://code.forgejo.org/forgejo-helm/forgejo
   ref:
-    tag: latest
+    tag: 3.0.0

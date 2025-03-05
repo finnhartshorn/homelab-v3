@@ -7,14 +7,10 @@ metadata:
   namespace: forgejo
 spec:
   interval: 30m
-  chart:
-    spec:
-      chart: .
-      version: 3.0.0
-      sourceRef:
-        kind: OCIRepository
-        name: forgejo
-        namespace: flux-system
+  chartRef:
+    kind: OCIRepository
+    name: forgejo
+    namespace: flux-system
   install:
     remediation:
       retries: 3
