@@ -34,3 +34,12 @@ spec:
         storageClass: longhorn
     metrics:
       enabled: true
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: internal
+        hosts:
+          - host: homeassistant.${SECRET_DOMAIN}
+            paths:
+              - path: /
+                pathType: Prefix
