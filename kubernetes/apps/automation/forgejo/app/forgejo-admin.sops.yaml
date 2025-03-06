@@ -5,9 +5,9 @@ metadata:
     name: forgejo-admin
     namespace: forgejo
 stringData:
-    email: ENC[AES256_GCM,data:JjBngZcRgCU693ZU2THSIi+TivArI5Ga7ScNCDH+E4Q=,iv:tNb4tDSPQMkNJvfr72UWGketxl2okcXa69k7QFGk1+k=,tag:fKhc/ZQenIaDYX9yULuSOA==,type:str]
-    password: ENC[AES256_GCM,data:Qg0ASbX7LVJCvjjWqh6jSfzfN7tkvpI6yRAdskgKptejlx8xYWjhJoSP5vM59BXaVXDggngl3rY=,iv:qivF+rqs8ae+6dQpWgNLKzJTVdxL/tkT9A6BEyxzq94=,tag:pKc7Fb8+YdU5hXC+VzTnhg==,type:str]
-    username: ENC[AES256_GCM,data:5P7j62c/ht4=,iv:KwJJkitOk0W8jiPAQMGgW2AZzlKjrhpObQUq8RJbb+c=,tag:Dw1Ykhrbma5nfvX8uz+zvA==,type:str]
+    email: ENC[AES256_GCM,data:a1FyFxIy/O6GyxtgG7z6eBNzHWWqjBQ=,iv:qzQNRbrNqbI9hIbfnxoXKft3sB+F/81XV8rKOC+3Ios=,tag:VKqK+aP7qCnTnVfbYgKBXw==,type:str]
+    password: ENC[AES256_GCM,data:6rc4eWAVh/3sIYSjjzfBboNmzlEJkYbP/lNCBoVqohgSygoO8n0HgQ==,iv:noSocDAjt6txOaFSHlDqBy8oQj0G1pzQ8xvofgM/jxU=,tag:+SJuWbAfQn6TuKXzB2kqyA==,type:str]
+    username: ENC[AES256_GCM,data:dl8gwQ==,iv:TIvXaBN/AOV4ZFRzykSZ13OgxusJ7/v46chGiJnldIA=,tag:3mcTdLMm2ieh0dgLv4BYog==,type:str]
 sops:
     kms: []
     gcp_kms: []
@@ -23,8 +23,8 @@ sops:
             R3JEVFNxMU51SC9TNGdKUGJJZGpSSlEKKQEVvBC1nnl0orwFdVjMudW0VIgrmK5D
             XsgRn0AYDjQip2O16PNoY+sRJrU75wKAn3Y1LPexisELhya4nRS/cA==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2025-03-03T20:43:06Z"
-    mac: ENC[AES256_GCM,data:NQe+ftcQi5X7JuIXSXw652ujum06aFOSNY6r7VfnQyF6QppMeZ3lNbQPGx1T9OLGEfgWyL/PwUBHFd0UySqQ6KfiEMfsQpV9MyvWhnENA6DdL/xQ1FttDzPDYOa87UsAd1ELZDYkiNwcUbxspRB1b/YUuG6yNAKuG67tXbEn0sM=,iv:olKzyvRQCfu8SPH/EQTH3U2Vq1Vc8T9z8bs0uoFq+Q4=,tag:FBiUZd+qPDbtSQewyQ3z0w==,type:str]
+    lastmodified: "2025-03-06T09:02:03Z"
+    mac: ENC[AES256_GCM,data:G05siNE7GU+nFLClE0XnecMNw13ZRtw2fK81W1CR3NWbgMKpeS8MsB4EsWfinCMmsWpamFlnWjlRatdlEBN5pLrIb+korlvJQreHSmXRgANtF4tdDlB3GUqpvSUK/47R3S2na8I/WC/Tlml41GglVrzD92DetPXUshWC2M9PaQI=,iv:HONvOHG3v7p4jNu1SRr87DdAGSO+SEbb94Kc9PUpvg4=,tag:PdoMeOzmFYVgFGoD1R0Nhw==,type:str]
     pgp: []
     encrypted_regex: ^(data|stringData)$
     mac_only_encrypted: true
