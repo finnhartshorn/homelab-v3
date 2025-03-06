@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   - ./windmill/ks.yaml
   - ./forgejo/ks.yaml
+  - ./home-assistant/ks.yaml
 components:
   - ../../flux/components/namespace
 patches:
@@ -22,3 +23,11 @@ patches:
         value: forgejo
     target:
       kind: Namespace
+  - # Add the name to the namespace
+    patch: |
+      - op: add
+        path: /metadata/name
+        value: home-assistant
+    target:
+      kind: Namespace
+
