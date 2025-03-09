@@ -1,0 +1,80 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ghidra
+  namespace: ghidra
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.1
+      interval: 15m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  # See https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/values.yaml
+  values:
+    controllers:
+      main:
+        containers:
+          app:
+            image:
+              repository: finnhartshorn/ghidra-server
+              tag: 10.3@sha256:d75f6b957d1ad0b5dbcaa6b0197b6f37b982a3616818a84a5abb6801be0ba4fe
+            env:
+              TZ: "Australia/Melbourne"
+              GHIDRA_CERT_PATH: "/opt/ghidra/cert"
+              GHIDRA_CERT_PASSWORD: ${GHIDRA_CERT_PASSWORD}
+              HOSTNAME: "ghidra.${SECRET_DOMAIN}"
+            resources:
+              requests:
+                memory: 250Mi
+                cpu: 100m
+              limits:
+                memory: 1500Mi
+        # pod:
+        #   securityContext:
+        #     runAsUser: 568
+        #     runAsGroup: 568
+        #     fsGroup: 568
+        #     fsGroupChangePolicy: "OnRootMismatch"
+    
+    persistence:
+      ghidra-certs:
+        storageClass: "longhorn"
+        accessMode: "ReadWriteOnce"
+        size: 100Mi
+        globalMounts:
+          - path: /opt/ghidra/cert
+      ghidra-repos:
+        storageClass: "longhorn"
+        accessMode: "ReadWriteOnce"
+        size: 10Gi
+        globalMounts:
+          - path: /srv/repositories
+    service:
+      main:
+        controller: main
+        type: LoadBalancer
+        ports:
+          port1:
+            port: 13100
+          port2:
+            port: 13101
+          port3:
+            port: 13102
+    # ingress:
+    #   main:
+    #     enabled: true
+    #     hosts:
+    #     - host: "ghidra.${SECRET_DOMAIN}"
+    #       paths:
+    #       - path: /
+    #         pathType: Prefix
+    #         service:
+    #           identifier: main
+    #           port: http
