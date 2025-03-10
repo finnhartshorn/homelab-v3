@@ -79,6 +79,7 @@
         'windmill',
         'docker.io/cloudflare/cloudflared',
         'app\\-template',
+        'home\\-assistant'
       ],
       matchUpdateTypes: [
         'minor',
