@@ -78,8 +78,8 @@
         'ghcr.io/flaresolverr/flaresolverr',
         'windmill',
         'docker.io/cloudflare/cloudflared',
-        'app\\-template',
-        'home\\-assistant'
+        "app-template",
+        "home-assistant"
       ],
       matchUpdateTypes: [
         'minor',
