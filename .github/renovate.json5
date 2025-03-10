@@ -78,6 +78,7 @@
         'ghcr.io/flaresolverr/flaresolverr',
         'windmill',
         'docker.io/cloudflare/cloudflared',
+        'code.forgejo.org/forgejo-helm/forgejo',
         "app*template",
         "home-assistant"
       ],
