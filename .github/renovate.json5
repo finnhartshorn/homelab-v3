@@ -78,7 +78,7 @@
         'ghcr.io/flaresolverr/flaresolverr',
         'windmill',
         'docker.io/cloudflare/cloudflared',
-        'app-template',
+        'app\\-template',
       ],
       matchUpdateTypes: [
         'minor',
