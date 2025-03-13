@@ -63,6 +63,7 @@ spec:
         ports:
           port1:
             port: 53
+            protocol: UDP
     ingress:
       main:
         enabled: true
