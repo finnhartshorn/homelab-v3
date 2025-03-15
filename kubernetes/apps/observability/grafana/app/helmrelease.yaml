@@ -210,3 +210,4 @@ spec:
       runAsGroup: 100
       fsGroup: 100
     testFramework:
+      enabled: false
