@@ -49,6 +49,7 @@ jobs:
 
       - if: ${{ steps.diff.outputs.diff != '' }}
         name: Create Pull Request
+        id: cpr
         uses: peter-evans/create-pull-request@v7
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
@@ -64,3 +65,9 @@ jobs:
 
             > [!TIP]
             > Merge this pull request and then run `mise upgrade --bump` on your workstation.
+      - name: automerge
+        if: ${{ steps.cpr.outputs.pull-request-number }}
+        uses: peter-evans/enable-pull-request-automerge@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull-request-number: steps.cpr.outputs.pull-request-number
