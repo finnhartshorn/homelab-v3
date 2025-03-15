@@ -79,7 +79,7 @@
         'windmill',
         'docker.io/cloudflare/cloudflared',
         'code.forgejo.org/forgejo-helm/forgejo',
-        "app*template",
+        "app**template",
         "home-assistant"
       ],
       matchUpdateTypes: [
