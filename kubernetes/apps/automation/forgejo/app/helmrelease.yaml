@@ -19,7 +19,7 @@ spec:
     remediation:
       retries: 3
   values:
-    replicaCount: 1
+    replicaCount: 0
     redis-cluster:
       enabled: false
     postgresql:
