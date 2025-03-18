@@ -80,7 +80,10 @@
         'docker.io/cloudflare/cloudflared',
         'code.forgejo.org/forgejo-helm/forgejo',
         "app**template",
-        "home-assistant"
+        "home-assistant",
+        "grafana",
+        "kube-prometheus-stack",
+        "prometheus-operator-crds"
       ],
       matchUpdateTypes: [
         'minor',
