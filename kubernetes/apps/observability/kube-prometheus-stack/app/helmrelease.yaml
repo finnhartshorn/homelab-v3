@@ -87,9 +87,10 @@ spec:
     kubeControllerManager:
       enabled: true
       endpoints: &cp
-        - 192.168.1.201
+        - 192.168.1.222
+        # - 192.168.1.201
         # - 192.168.1.203 // Add third node post migration
-        - 192.168.1.204
+        # - 192.168.1.204
       serviceMonitor:
         metricRelabelings:
           # Remove duplicate labels provided by k8s
