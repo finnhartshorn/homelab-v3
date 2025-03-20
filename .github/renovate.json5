@@ -72,9 +72,9 @@
         'Auto merge selected packages',
       ],
       matchPackageNames: [
-        'ghcr.io/onedr0p/prowlarr',
-        'ghcr.io/onedr0p/sonarr',
-        'ghcr.io/onedr0p/radarr',
+        'ghcr.io/home-operations/prowlarr',
+        'ghcr.io/home-operations/sonarr',
+        'gghcr.io/home-operations/radarr',
         'ghcr.io/flaresolverr/flaresolverr',
         'windmill',
         'docker.io/cloudflare/cloudflared',
