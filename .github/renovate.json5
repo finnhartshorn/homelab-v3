@@ -74,7 +74,7 @@
       matchPackageNames: [
         'ghcr.io/home-operations/prowlarr',
         'ghcr.io/home-operations/sonarr',
-        'gghcr.io/home-operations/radarr',
+        'ghcr.io/home-operations/radarr',
         'ghcr.io/flaresolverr/flaresolverr',
         'windmill',
         'docker.io/cloudflare/cloudflared',
