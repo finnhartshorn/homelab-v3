@@ -83,7 +83,8 @@
         "home-assistant",
         "grafana",
         "kube-prometheus-stack",
-        "prometheus-operator-crds"
+        "prometheus-operator-crds",
+        "uv"
       ],
       matchUpdateTypes: [
         'minor',
