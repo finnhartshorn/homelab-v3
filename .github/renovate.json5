@@ -84,7 +84,8 @@
         "grafana",
         "kube-prometheus-stack",
         "prometheus-operator-crds",
-        "uv"
+        "uv",
+        "astral-sh/uv"
       ],
       matchUpdateTypes: [
         'minor',
