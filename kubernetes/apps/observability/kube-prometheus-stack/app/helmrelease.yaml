@@ -133,8 +133,13 @@ spec:
           - auto-gomemlimit
           - memory-snapshot-on-shutdown
           - new-service-discovery-manager
-        retention: 2d
-        retentionSize: 8GB
+        additionalScrapeConfigs: |
+          - job_name: 'static-windows-exporter'
+            scheme: http
+            static_configs:
+              - targets: ['192.168.1.211:9182']
+        retention: 8d
+        retentionSize: 40GB
         resources:
           requests:
             cpu: 100m
