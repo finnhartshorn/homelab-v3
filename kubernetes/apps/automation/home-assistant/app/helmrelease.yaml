@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: home-assistant
-      version: 14.76.0
+      version: 14.77.0
       sourceRef:
         kind: HelmRepository
         name: andrenarchy
