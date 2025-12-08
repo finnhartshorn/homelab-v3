@@ -24,7 +24,7 @@ spec:
           app:
             image:
               repository: adguard/adguardhome
-              tag: v0.107.63@sha256:320ab49bd5f55091c7da7d1232ed3875f687769d6bb5e55eb891471528e2e18f
+              tag: v0.107.71@sha256:92929135ced2554aaf94706f766a98ad348f211df61b0704e2db7e8498cc00b7
             # env:
             #   TZ: "Australia/Melbourne"
             #   GHIDRA_CERT_PATH: "/opt/ghidra/cert"
