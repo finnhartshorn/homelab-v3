@@ -24,7 +24,7 @@ spec:
           app:
             image:
               repository: finnhartshorn/ghidra-server
-              tag: 11.4.3@sha256:40a9b7d6ff834ebf6c44002054803201a41d9bb4f69609428ea3fbc240fb2592
+              tag: 11.4.3@sha256:2de50c986964406d43d3e3688fea9f9660f13be6ccf38c3b2e5026f876b933c3
             env:
               TZ: "Australia/Melbourne"
               GHIDRA_CERT_PATH: "/opt/ghidra/cert"
