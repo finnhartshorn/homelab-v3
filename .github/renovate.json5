@@ -85,7 +85,8 @@
         "kube-prometheus-stack",
         "prometheus-operator-crds",
         "uv",
-        "astral-sh/uv"
+        "astral-sh/uv",
+        "yq"
       ],
       matchUpdateTypes: [
         'minor',
