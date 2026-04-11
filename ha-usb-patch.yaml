@@ -1,0 +1,8 @@
+machine:
+  kernel:
+    modules:
+      - name: cdc_acm    # ESP32 USB serial uses CDC ACM class
+  udev:
+    rules:
+      - SUBSYSTEM=="tty", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="831a", MODE="0660", GROUP="dialout"
+      - SUBSYSTEM=="usb", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="831a", MODE="0660"

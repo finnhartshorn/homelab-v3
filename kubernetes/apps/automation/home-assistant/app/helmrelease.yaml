@@ -25,6 +25,10 @@ spec:
   values:
     env:
       TZ: "Melbourne/Australia"
+
+    securityContext:
+      privileged: true
+
     persistence:
       config:
         enabled: true
@@ -32,6 +36,23 @@ spec:
         accessMode: ReadWriteOnce
         size: 1Gi
         storageClass: longhorn
+      usb:
+        enabled: true
+        type: hostPath
+        hostPath: /dev/serial/by-id/usb-Nabu_Casa_ZBT-2_DCB4D90E68C8-if00
+        hostPathType: CharDevice
+        mountPath: /dev/ttyUSB0
+
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: In
+                  values:
+                    - node3   # replace with the node the ZBT-2 is plugged into
+
     metrics:
       enabled: true
     ingress:
