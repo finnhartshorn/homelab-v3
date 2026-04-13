@@ -48,6 +48,16 @@ spec:
             paths:
               - path: /
                 pathType: Prefix
+      nodeport:
+        enabled: true
+        type: NodePort
+        ports:
+          http:
+            enabled: true
+            port: 8123
+            targetPort: 8123
+            nodePort: 30123
+            protocol: TCP
     addons:
       codeserver:
         enabled: true
