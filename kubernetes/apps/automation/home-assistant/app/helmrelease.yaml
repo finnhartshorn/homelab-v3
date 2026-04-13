@@ -48,6 +48,7 @@ spec:
             paths:
               - path: /
                 pathType: Prefix
+    service:
       nodeport:
         enabled: true
         type: NodePort
