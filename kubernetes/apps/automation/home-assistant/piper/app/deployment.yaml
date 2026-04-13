@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: piper
+  namespace: home-assistant
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: piper
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: piper
+    spec:
+      containers:
+        - name: piper
+          image: rhasspy/wyoming-piper:latest
+          args:
+            - --voice
+            - en_GB-jenny_dioco-medium
+          ports:
+            - name: wyoming
+              containerPort: 10200
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: piper
+  namespace: home-assistant
+spec:
+  selector:
+    app.kubernetes.io/name: piper
+  ports:
+    - name: wyoming
+      port: 10200
+      targetPort: wyoming
+      protocol: TCP
