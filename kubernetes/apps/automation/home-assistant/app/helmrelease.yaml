@@ -51,13 +51,12 @@ spec:
     service:
       nodeport:
         enabled: true
-        type: NodePort
+        type: LoadBalancer
         ports:
           http:
             enabled: true
             port: 8123
             targetPort: 8123
-            nodePort: 30123
             protocol: TCP
     addons:
       codeserver:
