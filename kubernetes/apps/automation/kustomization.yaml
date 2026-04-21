@@ -7,6 +7,7 @@ resources:
   - ./forgejo/ks.yaml
   - ./home-assistant/ks.yaml
   - ./home-assistant/piper/ks.yaml
+  - ./home-assistant/matter-server/ks.yaml
 components:
   - ../../flux/components/namespace
 patches:

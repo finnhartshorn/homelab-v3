@@ -8,6 +8,7 @@ resources:
   - ./cilium.yaml
   - ./controlplaneio.yaml
   - ./coredns.yaml
+  - ./derwitt-dev.yaml
   - ./csi-driver-smb.yaml
   - ./external-dns.yaml
   - ./grafana.yaml
