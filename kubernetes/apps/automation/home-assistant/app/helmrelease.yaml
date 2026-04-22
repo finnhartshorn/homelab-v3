@@ -44,7 +44,7 @@ spec:
           nginx.org/websocket-services: home-assistant
         ingressClassName: internal
         hosts:
-          - host: homeassistant.${SECRET_DOMAIN}
+          - host: homeassistant-old.${SECRET_DOMAIN}
             paths:
               - path: /
                 pathType: Prefix
