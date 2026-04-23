@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/v1.18.1-standalone-strict/secret-v1.json
+# TODO: encrypt with: sops -e -i influxdb-auth.sops.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: influxdb-auth
+  namespace: observability
+stringData:
+  INFLUXDB3_AUTH_TOKEN: ENC[AES256_GCM,data:A2t8+I1zNIBGm4sYCY6QBVl9cboYDL9Nuvg9L8rTHFAf+AHdQmJw8utujZ1GqgAVrnq9K+KQROYF3Az01BVy2Q==,iv:ljV9IORLdl9LGDdKPKIDqPFxStEj6Pl3cZ0w9eIWp4A=,tag:p/jGbaQ66e+nl0nEVRcy7w==,type:str]
+sops:
+  age:
+    - recipient: age13582xjhh7tpn3qsqktzukcdm04cnrn8fw9jhuv647jtqhzd20vaq4xtqe2
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBWb1VKY3FoMkpUSXArYlN6
+        TWJGWFU0Vm1hVHJ5YkNVOGFaSEthbEtzazFNCmlBTlBRMDRsRFFQSkJvd3BCUjMw
+        NGFTU0lLWHplMjdqU0Z2RnR6Vm5VREUKLS0tIFNzZjRUUDAzMHh6U3BNc2JldDQw
+        MW5xallLVm5ib2xWbXpVdEc3MEVqOU0K+pEGJr4QVo10AuAnrnW/UU6wUVagB9+K
+        /wjhg/JP46tfIx0NysNvy3o8Fy7/zKiQjpijeUn5Y/6gTo9b6iESyw==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2026-04-23T22:49:57Z"
+  mac: ENC[AES256_GCM,data:P+5GxhOqtCglunMD0gkIGvvs9bhYFtcI3/uWBvyZXB56kR2f7YbouZxD3BhWUnlhSWCGA6GM5yosT1zYKOZmHiRjdsCmmE8gKkkWxUX0Bo7p/3+yyXPW/3ko53koBQV9tzyTdoAkFKmFJ2rwg1xATyygyKcgDSuTuPO7lz16l68=,iv:Sf82aPvGzwH2C9kYwTHn3BbL8aleD/nPH3Sl6Ik7Cvw=,tag:jUToSn9Wq8e0WCy40hJxkw==,type:str]
+  encrypted_regex: ^(data|stringData)$
+  mac_only_encrypted: true
+  version: 3.12.2

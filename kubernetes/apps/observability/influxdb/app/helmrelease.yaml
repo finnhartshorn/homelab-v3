@@ -1,0 +1,66 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: influxdb
+  namespace: observability
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.3
+      interval: 15m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  # See https://github.com/bjw-s/helm-charts/blob/main/charts/library/common/values.yaml
+  values:
+    controllers:
+      main:
+        containers:
+          app:
+            image:
+              repository: quay.io/influxdb/influxdb3-core
+              tag: latest
+            env:
+              INFLUXDB3_OBJECT_STORE: file
+              INFLUXDB3_DB_DIR: /var/lib/influxdb3
+              INFLUXDB3_HTTP_BIND_ADDR: "0.0.0.0:8086"
+              INFLUXDB3_AUTH_TOKEN:
+                valueFrom:
+                  secretKeyRef:
+                    name: influxdb-auth
+                    key: INFLUXDB3_AUTH_TOKEN
+            resources:
+              requests:
+                memory: 256Mi
+                cpu: 100m
+              limits:
+                memory: 1Gi
+    persistence:
+      data:
+        storageClass: longhorn
+        accessMode: ReadWriteOnce
+        size: 20Gi
+        globalMounts:
+          - path: /var/lib/influxdb3
+    service:
+      main:
+        controller: main
+        ports:
+          http:
+            port: 8086
+    ingress:
+      main:
+        enabled: true
+        hosts:
+          - host: "influxdb.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: http
