@@ -67,9 +67,7 @@ spec:
       metrics:
         enabled: true
         serviceMonitor:
-          enabled: true
-          namespaceSelector:
-            any: true
+          enabled: false
       extraArgs:
         default-ssl-certificate: "cert-manager/${SECRET_DOMAIN/./-}-production-tls"
       resources:

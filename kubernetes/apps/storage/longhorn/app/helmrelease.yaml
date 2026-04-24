@@ -24,7 +24,7 @@ spec:
   values:
     monitoring:
         enabled: true
-        createPrometheusRules: true
+        createPrometheusRules: false
     persistence:
       defaultClass: true
       defaultClassReplicaCount: 3

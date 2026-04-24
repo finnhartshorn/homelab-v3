@@ -28,7 +28,7 @@ spec:
       registry:
         hostPort: 29999
     serviceMonitor:
-      enabled: true
+      enabled: false
     spegel:
       containerdSock: /run/containerd/containerd.sock
       containerdRegistryConfigPath: /etc/cri/conf.d/hosts
