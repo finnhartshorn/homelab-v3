@@ -44,6 +44,7 @@ spec:
             type: influxdb
             access: proxy
             url: http://influxdb.observability.svc.cluster.local:8086
+            database: homeassistant
             jsonData:
               version: InfluxQL
               httpHeaderName1: Authorization
