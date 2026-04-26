@@ -45,11 +45,10 @@ spec:
             access: proxy
             url: http://influxdb.observability.svc.cluster.local:8086
             jsonData:
-              version: Flux
-              organization: ""
-              defaultBucket: ""
+              version: InfluxQL
+              httpHeaderName1: Authorization
             secureJsonData:
-              token: $INFLUXDB3_TOKEN
+              httpHeaderValue1: Bearer $INFLUXDB3_TOKEN
     ingress:
       enabled: true
       ingressClassName: internal
