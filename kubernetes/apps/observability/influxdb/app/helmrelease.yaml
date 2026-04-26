@@ -35,7 +35,6 @@ spec:
               - --object-store=file
               - --data-dir=/var/lib/influxdb3
               - --http-bind=0.0.0.0:8086
-              - --without-auth
             resources:
               requests:
                 memory: 256Mi
