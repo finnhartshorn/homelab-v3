@@ -28,6 +28,7 @@ spec:
       type: Recreate
     admin:
       existingSecret: grafana-admin
+    envFromSecret: influxdb-auth
     grafana.ini:
       analytics:
         check_for_updates: false
@@ -47,6 +48,8 @@ spec:
               version: Flux
               organization: ""
               defaultBucket: ""
+            secureJsonData:
+              token: $INFLUXDB3_TOKEN
     ingress:
       enabled: true
       ingressClassName: internal

@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/v1.18.1-standalone-strict/secret-v1.json
+# TODO: fill in token from `influxdb3 create token --admin`, then: sops -e -i influxdb-auth.sops.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: influxdb-auth
+  namespace: observability
+stringData:
+  INFLUXDB3_TOKEN: "apiv3_2FUDqzOJ3PJ7NAb3tFI-BNP4PK_99P_4_h1aNXTxC2HMX9yeTWOkIM2Woc4FpBCCbaI79us7KAWv1r4HtOtLoQ"

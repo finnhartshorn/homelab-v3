@@ -5,3 +5,4 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./grafana-admin.sops.yaml
+  - ./influxdb-auth.sops.yaml
