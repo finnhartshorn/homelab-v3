@@ -37,10 +37,10 @@ spec:
               - --http-bind=0.0.0.0:8086
             resources:
               requests:
-                memory: 256Mi
+                memory: 1Gi
                 cpu: 100m
               limits:
-                memory: 1Gi
+                memory: 4Gi
     persistence:
       data:
         storageClass: longhorn

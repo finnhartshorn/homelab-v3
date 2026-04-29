@@ -26,6 +26,9 @@ spec:
   values:
     deploymentStrategy:
       type: Recreate
+    resources:
+      limits:
+        memory: 512Mi
     admin:
       existingSecret: grafana-admin
     envFromSecret: influxdb-auth

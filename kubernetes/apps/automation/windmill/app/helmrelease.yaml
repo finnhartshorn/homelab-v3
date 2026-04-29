@@ -29,12 +29,30 @@ spec:
       workerGroups:
         - name: "default"
           replicas: 1
+          resources:
+            limits:
+              memory: 1Gi
         - name: "native"
           replicas: 1
+          resources:
+            limits:
+              memory: 1Gi
       app:
         podSecurityContext:
           runAsUser: 1000
           runAsNonRoot: true
+        resources:
+          limits:
+            memory: 1Gi
+      lsp:
+        resources:
+          limits:
+            memory: 1Gi
+    postgresql:
+      primary:
+        resources:
+          limits:
+            memory: 1Gi
     ingress:
       enabled: true
       ingressClassName: internal
