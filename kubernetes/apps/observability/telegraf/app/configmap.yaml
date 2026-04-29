@@ -13,7 +13,7 @@ data:
 
     [[inputs.prometheus]]
       urls = ["http://influxdb.observability.svc.cluster.local:8086/metrics"]
-      [inputs.prometheus.headers]
+      [inputs.prometheus.http_headers]
         Authorization = "Bearer ${INFLUXDB3_TOKEN}"
 
     [[inputs.prometheus]]
