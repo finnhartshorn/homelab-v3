@@ -23,7 +23,7 @@ spec:
           app:
             image:
               repository: docker.io/library/telegraf
-              tag: "1.33"
+              tag: "1.38"
             envFrom:
               - secretRef:
                   name: influxdb-auth
