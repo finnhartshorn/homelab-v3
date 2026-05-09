@@ -24,7 +24,7 @@ spec:
           app:
             image:
               repository: ghcr.io/home-operations/prowlarr
-              tag: 1.37.0.5076@sha256:aab0bfd4e96bdca19cca280a2bbf8ac60b9251dcae13459856b724a2dd3ae020 
+              tag: 2.3.7.5365@sha256:b9557d772c974901aed9285189d904b613f1f07750fca930eecfe78544bd3d48 
             env:
               TZ: "Australia/Melbourne"
               PROWLARR__INSTANCE_NAME: Prowlarr
