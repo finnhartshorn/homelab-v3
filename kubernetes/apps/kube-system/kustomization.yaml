@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   - ./cilium/ks.yaml
   - ./coredns/ks.yaml
+  - ./image-prune/ks.yaml
   - ./csi-driver-smb/ks.yaml
   - ./metrics-server/ks.yaml
   - ./reloader/ks.yaml

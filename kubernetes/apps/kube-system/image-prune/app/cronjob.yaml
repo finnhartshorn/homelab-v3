@@ -1,0 +1,67 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: image-prune
+spec:
+  schedule: "0 3 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 3600
+      completions: 3
+      parallelism: 3
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: image-prune
+        spec:
+          restartPolicy: OnFailure
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: image-prune
+                  topologyKey: kubernetes.io/hostname
+          initContainers:
+            - name: install-crictl
+              image: docker.io/library/alpine:latest
+              imagePullPolicy: IfNotPresent
+              command:
+                - sh
+                - -c
+                - |
+                  apk add --no-cache wget tar
+                  wget -q -O /tmp/crictl.tar.gz \
+                    https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.32.0/crictl-v1.32.0-linux-amd64.tar.gz
+                  tar -xzf /tmp/crictl.tar.gz -C /usr/local/bin
+              volumeMounts:
+                - name: bin
+                  mountPath: /usr/local/bin
+          containers:
+            - name: image-prune
+              image: docker.io/library/alpine:latest
+              imagePullPolicy: IfNotPresent
+              command:
+                - sh
+                - -c
+                - |
+                  echo "runtime-endpoint: unix:///run/containerd/containerd.sock" > /etc/crictl.yaml
+                  crictl rmi --prune
+              securityContext:
+                privileged: true
+              volumeMounts:
+                - name: bin
+                  mountPath: /usr/local/bin
+                - name: containerd-sock
+                  mountPath: /run/containerd/containerd.sock
+          volumes:
+            - name: bin
+              emptyDir: {}
+            - name: containerd-sock
+              hostPath:
+                path: /run/containerd/containerd.sock
+                type: Socket
