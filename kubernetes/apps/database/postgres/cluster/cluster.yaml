@@ -21,6 +21,16 @@ spec:
     limits:
       memory: 1Gi
 
+  managed:
+    databases:
+      - name: windmill
+        owner: windmill
+    roles:
+      - name: windmill
+        login: true
+        passwordSecret:
+          name: windmill-db-credentials
+
   backup:
     barmanObjectStore:
       destinationPath: s3://cnpg-backups/
