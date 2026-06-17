@@ -22,6 +22,9 @@ spec:
     remediation:
       retries: 3
   values:
+    defaultSettings:
+      backupTarget: s3://longhorn-backups@us-east-1/
+      backupTargetCredentialSecret: longhorn-minio-secret
     monitoring:
         enabled: true
         createPrometheusRules: false
@@ -30,7 +33,7 @@ spec:
       defaultClassReplicaCount: 3
       reclaimPolicy: Delete
       recurringJobSelector:
-        enable: false
+        enable: true
     ingress:
       enabled: true
       ingressClassName: internal
