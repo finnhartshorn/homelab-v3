@@ -7,3 +7,4 @@ resources:
   - ./windmill-db-credentials.sops.yaml
   - ./cluster.yaml
   - ./scheduled-backup.yaml
+  - ./database-windmill.yaml
