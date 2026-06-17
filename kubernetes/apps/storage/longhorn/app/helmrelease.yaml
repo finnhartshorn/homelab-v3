@@ -22,9 +22,6 @@ spec:
     remediation:
       retries: 3
   values:
-    defaultSettings:
-      backupTarget: s3://longhorn-backups@us-east-1/
-      backupTargetCredentialSecret: longhorn-minio-secret
     monitoring:
         enabled: true
         createPrometheusRules: false
