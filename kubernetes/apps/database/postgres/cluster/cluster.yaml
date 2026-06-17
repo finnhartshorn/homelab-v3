@@ -27,6 +27,10 @@ spec:
         login: true
         passwordSecret:
           name: windmill-db-credentials
+      - name: windmill_admin
+        login: false
+      - name: windmill_user
+        login: false
 
   backup:
     barmanObjectStore:
