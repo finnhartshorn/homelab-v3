@@ -30,7 +30,7 @@ spec:
       defaultClassReplicaCount: 3
       reclaimPolicy: Delete
       recurringJobSelector:
-        enable: false
+        enable: true
     ingress:
       enabled: true
       ingressClassName: internal

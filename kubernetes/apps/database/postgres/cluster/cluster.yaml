@@ -1,0 +1,50 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgres
+spec:
+  instances: 3
+
+  storage:
+    size: 10Gi
+    storageClass: openebs-hostpath
+
+  affinity:
+    podAntiAffinityType: required
+    topologyKey: kubernetes.io/hostname
+
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 1Gi
+
+  managed:
+    roles:
+      - name: windmill
+        login: true
+        passwordSecret:
+          name: windmill-db-credentials
+      - name: windmill_admin
+        login: false
+      - name: windmill_user
+        login: false
+
+  backup:
+    barmanObjectStore:
+      destinationPath: s3://cnpg-backups/
+      endpointURL: http://192.168.1.241:9000
+      s3Credentials:
+        accessKeyId:
+          name: cnpg-minio-secret
+          key: ACCESS_KEY_ID
+        secretAccessKey:
+          name: cnpg-minio-secret
+          key: ACCESS_SECRET_KEY
+      wal:
+        compression: gzip
+      data:
+        compression: gzip
+    retentionPolicy: "30d"

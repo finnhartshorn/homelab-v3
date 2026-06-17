@@ -6,6 +6,7 @@ resources:
   - ./andrenarchy.yaml
   - ./bjw-s.yaml
   - ./cilium.yaml
+  - ./cnpg.yaml
   - ./controlplaneio.yaml
   - ./coredns.yaml
   - ./derwitt-dev.yaml
