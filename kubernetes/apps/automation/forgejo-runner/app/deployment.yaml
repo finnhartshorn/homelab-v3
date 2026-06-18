@@ -19,35 +19,16 @@ spec:
       automountServiceAccountToken: false
       restartPolicy: Always
       initContainers:
-      - name: runner-register
+      - name: runner-config
         image: code.forgejo.org/forgejo/runner:12.11.1
         command: ["/bin/bash", "-c"]
         args:
         - |
-          while : ; do
-            forgejo-runner register --no-interactive \
-              --token $(RUNNER_SECRET) \
-              --name $(RUNNER_NAME) \
-              --instance $(FORGEJO_INSTANCE_URL) && break
-            sleep 1
-          done
           forgejo-runner generate-config > /data/config.yml
           sed -i -e "s|network: .*|network: host|" /data/config.yml
           sed -i -e "s|^ envs:$| envs:\n   DOCKER_HOST: tcp://localhost:2376\n   DOCKER_TLS_VERIFY: 1\n   DOCKER_CERT_PATH: /certs/client|" /data/config.yml
           sed -i -e "s|^ options:| options: -v /certs/client:/certs/client|" /data/config.yml
           sed -i -e "s| valid_volumes: \[\]$| valid_volumes:\n   - /certs/client|" /data/config.yml
-        env:
-        - name: RUNNER_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: RUNNER_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: forgejo-runner-secret
-              key: token
-        - name: FORGEJO_INSTANCE_URL
-          value: http://forgejo-http.forgejo.svc.cluster.local:3000
         volumeMounts:
         - name: runner-data
           mountPath: /data
@@ -68,8 +49,15 @@ spec:
             echo 'waiting for docker daemon...'
             sleep 5
           done
-          forgejo-runner --config /data/config.yml daemon
+          forgejo-runner daemon \
+            --config /data/config.yml \
+            --url http://forgejo-http.forgejo.svc.cluster.local:3000 \
+            --uuid $(RUNNER_UUID) \
+            --token-url file:///runner-secret/token \
+            --label docker:docker://node:lts
         env:
+        - name: RUNNER_UUID
+          value: "a69b3fd3-8932-41ea-a65f-7d67e8c80444"
         - name: DOCKER_HOST
           value: tcp://localhost:2376
         - name: DOCKER_CERT_PATH
@@ -88,6 +76,9 @@ spec:
           mountPath: /certs
         - name: runner-data
           mountPath: /data
+        - name: runner-secret
+          mountPath: /runner-secret
+          readOnly: true
         - name: tmp
           mountPath: /tmp
         securityContext:
@@ -119,5 +110,8 @@ spec:
         emptyDir: {}
       - name: runner-data
         emptyDir: {}
+      - name: runner-secret
+        secret:
+          secretName: forgejo-runner-secret
       - name: tmp
         emptyDir: {}
