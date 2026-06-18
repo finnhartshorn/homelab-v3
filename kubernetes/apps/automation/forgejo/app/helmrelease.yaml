@@ -44,6 +44,8 @@ spec:
       storageClass: "longhorn"
     gitea:
       config:
+        server:
+          ROOT_URL: https://git.${SECRET_DOMAIN}
         database:
           DB_TYPE: sqlite3
         session:
@@ -52,6 +54,8 @@ spec:
           ADAPTER: memory
         queue:
           TYPE: level
+        actions:
+          ENABLED: true
       admin:
         existingSecret: forgejo-admin
         email: finnhartshorn@gmail.com
