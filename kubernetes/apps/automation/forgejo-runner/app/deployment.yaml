@@ -20,7 +20,7 @@ spec:
       restartPolicy: Always
       initContainers:
       - name: runner-register
-        image: code.forgejo.org/forgejo/runner:6.4.0
+        image: code.forgejo.org/forgejo/runner:12.11.1
         command: ["/bin/bash", "-c"]
         args:
         - |
@@ -60,7 +60,7 @@ spec:
           runAsNonRoot: true
       containers:
       - name: runner
-        image: code.forgejo.org/forgejo/runner:6.4.0
+        image: code.forgejo.org/forgejo/runner:12.11.1
         command: ["/bin/bash", "-c"]
         args:
         - |
