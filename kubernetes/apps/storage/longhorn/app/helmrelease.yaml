@@ -22,6 +22,8 @@ spec:
     remediation:
       retries: 3
   values:
+    defaultSettings:
+      concurrentAutomaticEngineUpgradePerNodeLimit: 1
     monitoring:
         enabled: true
         createPrometheusRules: false
