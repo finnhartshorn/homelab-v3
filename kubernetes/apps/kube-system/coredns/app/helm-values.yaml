@@ -9,6 +9,16 @@ service:
 replicaCount: 2
 servers:
   - zones:
+      - zone: finnethen.com
+        scheme: dns://
+    port: 53
+    plugins:
+      - name: errors
+      - name: forward
+        parameters: . 192.168.1.212 192.168.1.227
+      - name: cache
+        parameters: 30
+  - zones:
       - zone: .
         scheme: dns://
         use_tcp: true
