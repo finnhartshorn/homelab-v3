@@ -54,7 +54,7 @@ spec:
             --url http://forgejo-http.forgejo.svc.cluster.local:3000 \
             --uuid $(RUNNER_UUID) \
             --token-url file:///runner-secret/token \
-            --label docker:docker://node:lts
+            --label docker:docker://catthehacker/ubuntu:act-24.04
         env:
         - name: RUNNER_UUID
           value: "a69b3fd3-8932-41ea-a65f-7d67e8c80444"
