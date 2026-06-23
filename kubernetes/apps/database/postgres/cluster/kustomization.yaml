@@ -5,6 +5,8 @@ kind: Kustomization
 resources:
   - ./minio-secret.sops.yaml
   - ./windmill-db-credentials.sops.yaml
+  - ./quizzer-db-credentials.sops.yaml
   - ./cluster.yaml
   - ./scheduled-backup.yaml
   - ./database-windmill.yaml
+  - ./database-quizzer.yaml

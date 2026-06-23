@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: quizzer
+  namespace: quizzer
+spec:
+  ingressClassName: internal
+  rules:
+    - host: quiz.${SECRET_DOMAIN}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: quizzer
+                port:
+                  name: http

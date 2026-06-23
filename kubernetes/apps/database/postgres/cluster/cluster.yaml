@@ -23,6 +23,10 @@ spec:
 
   managed:
     roles:
+      - name: quizzer
+        login: true
+        passwordSecret:
+          name: quizzer-db-credentials
       - name: windmill
         login: true
         passwordSecret:

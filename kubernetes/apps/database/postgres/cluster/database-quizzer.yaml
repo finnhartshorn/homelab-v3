@@ -1,0 +1,9 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: quizzer
+spec:
+  name: quizzer
+  owner: quizzer
+  cluster:
+    name: postgres
