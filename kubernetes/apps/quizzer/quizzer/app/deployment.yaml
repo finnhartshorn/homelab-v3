@@ -14,6 +14,8 @@ spec:
         app.kubernetes.io/name: quizzer
     spec:
       automountServiceAccountToken: false
+      imagePullSecrets:
+        - name: forgejo-registry
       containers:
         - name: quizzer
           image: git.finnethen.com/finn/quizzer:v0.2.0
