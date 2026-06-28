@@ -18,7 +18,7 @@ spec:
         - name: forgejo-registry
       containers:
         - name: quizzer
-          image: git.finnethen.com/finn/quizzer:v0.6.1
+          image: git.finnethen.com/finn/quizzer:v0.7.0
           ports:
             - name: http
               containerPort: 3000
