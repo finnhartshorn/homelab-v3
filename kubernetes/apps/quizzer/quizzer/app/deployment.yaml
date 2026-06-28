@@ -29,11 +29,31 @@ spec:
                 secretKeyRef:
                   name: quizzer-db-secret
                   key: databaseUrl
-            - name: QUIZZES_DIR
-              value: /app/data/quizzes
-          volumeMounts:
-            - name: quizzes
-              mountPath: /app/data/quizzes
+            - name: S3_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: quizzer-minio-secret
+                  key: S3_BUCKET
+            - name: S3_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: quizzer-minio-secret
+                  key: S3_ENDPOINT
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: quizzer-minio-secret
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: quizzer-minio-secret
+                  key: AWS_SECRET_ACCESS_KEY
+            - name: AWS_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: quizzer-minio-secret
+                  key: AWS_REGION
           livenessProbe:
             httpGet:
               path: /
@@ -46,7 +66,3 @@ spec:
             limits:
               cpu: 500m
               memory: 256Mi
-      volumes:
-        - name: quizzes
-          persistentVolumeClaim:
-            claimName: quizzer-quizzes

@@ -6,7 +6,7 @@ resources:
   - ./deployment.yaml
   - ./service.yaml
   - ./ingress.yaml
-  - ./pvc.yaml
+  - ./minio-secret.sops.yaml
   - ./db-secret.sops.yaml
 components:
   - ../../../../flux/components/forgejo-pull-secret
