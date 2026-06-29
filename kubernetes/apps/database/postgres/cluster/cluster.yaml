@@ -6,6 +6,10 @@ metadata:
 spec:
   instances: 3
 
+  enableSuperuserAccess: true
+  superuserSecret:
+    name: postgres-superuser-credentials
+
   storage:
     size: 10Gi
     storageClass: openebs-hostpath
