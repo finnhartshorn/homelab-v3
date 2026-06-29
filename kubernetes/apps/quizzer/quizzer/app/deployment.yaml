@@ -59,6 +59,7 @@ spec:
               path: /
               port: 3000
             initialDelaySeconds: 10
+            timeoutSeconds: 5
           resources:
             requests:
               cpu: 50m
