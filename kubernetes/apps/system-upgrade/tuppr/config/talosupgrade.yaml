@@ -1,0 +1,23 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/home-operations/tuppr/main/charts/tuppr/crds/tuppr.home-operations.com_talosupgrades.yaml
+apiVersion: tuppr.home-operations.com/v1alpha1
+kind: TalosUpgrade
+metadata:
+  name: cluster
+spec:
+  # Pinned to the version currently running on all nodes: bump this by hand,
+  # one minor version at a time, following the supported upgrade path.
+  talos:
+    version: v1.9.5
+
+  healthChecks:
+    - apiVersion: v1
+      kind: Node
+      expr: status.conditions.exists(c, c.type == "Ready" && c.status == "True")
+      timeout: 10m
+
+  maintenance:
+    windows:
+      - start: "0 1 * * *"
+        duration: "4h"
+        timezone: "Australia/Sydney"

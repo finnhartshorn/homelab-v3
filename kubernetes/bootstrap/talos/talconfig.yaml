@@ -1,9 +1,9 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/budimanjojo/talhelper/master/pkg/config/schemas/talconfig.json
 ---
 # renovate: datasource=docker depName=ghcr.io/siderolabs/installer
-talosVersion: v1.10.5
+talosVersion: v1.9.5
 # renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
-kubernetesVersion: v1.33.3
+kubernetesVersion: v1.32.1
 
 clusterName: kubernetes
 endpoint: https://192.168.1.222:6443
@@ -44,6 +44,46 @@ nodes:
         vip:
           ip: "192.168.1.222"
 
+  - hostname: "node2"
+    ipAddress: "192.168.1.204"
+    installDisk: "/dev/sdb"
+    machineSpec:
+      secureboot: false
+    talosImageURL: factory.talos.dev/installer/376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba
+    controlPlane: true
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "6c:2b:59:d1:02:79"
+        dhcp: false
+        addresses:
+          - "192.168.1.204/24"
+        routes:
+          - network: "0.0.0.0/0"
+            gateway: "192.168.1.1"
+        mtu: 1500
+        vip:
+          ip: "192.168.1.222"
+
+  - hostname: "node3"
+    ipAddress: "192.168.1.201"
+    installDisk: "/dev/sdb"
+    machineSpec:
+      secureboot: false
+    talosImageURL: factory.talos.dev/installer/376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba
+    controlPlane: true
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "54:bf:64:99:24:42"
+        dhcp: false
+        addresses:
+          - "192.168.1.201/24"
+        routes:
+          - network: "0.0.0.0/0"
+            gateway: "192.168.1.1"
+        mtu: 1500
+        vip:
+          ip: "192.168.1.222"
+
 # Global patches
 patches:
   - "@./patches/global/machine-files.yaml"
@@ -51,6 +91,7 @@ patches:
   - "@./patches/global/machine-network.yaml"
   - "@./patches/global/machine-sysctls.yaml"
   - "@./patches/global/machine-time.yaml"
+  - "@./patches/global/machine-talos-api-access.yaml"
 
 # Controller patches
 controlPlane:
