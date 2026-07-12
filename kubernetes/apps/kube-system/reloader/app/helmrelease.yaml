@@ -26,5 +26,4 @@ spec:
     reloader:
       readOnlyRootFileSystem: true
       podMonitor:
-        enabled: true
-        namespace: "{{ .Release.Namespace }}"
+        enabled: false

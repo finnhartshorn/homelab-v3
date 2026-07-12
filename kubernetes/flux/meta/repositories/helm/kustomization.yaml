@@ -19,7 +19,6 @@ resources:
   - ./longhorn.yaml
   - ./metrics-server.yaml
   - ./openebs.yaml
-  - ./prometheus-community.yaml
   - ./spegel.yaml
   - ./stakater.yaml
   - ./windmill.yaml

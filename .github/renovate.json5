@@ -83,8 +83,6 @@
         'home-assistant',
         'home-assistant-matter-server',
         'grafana',
-        'kube-prometheus-stack',
-        'prometheus-operator-crds',
         'uv',
         'astral-sh/uv',
         'mikefarah/yq',
