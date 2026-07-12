@@ -10,7 +10,7 @@ spec:
   # only merge a step at a time, following the supported upgrade path.
   talos:
     # renovate: datasource=docker depName=ghcr.io/siderolabs/installer
-    version: v1.9.5
+    version: v1.9.6
 
   healthChecks:
     - apiVersion: v1
