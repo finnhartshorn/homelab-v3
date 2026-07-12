@@ -10,7 +10,7 @@ spec:
   # only merge a step at a time, following the supported upgrade path.
   kubernetes:
     # renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
-    version: v1.32.1
+    version: v1.35.6
 
   healthChecks:
     - apiVersion: v1
