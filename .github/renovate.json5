@@ -164,6 +164,34 @@
       ],
     },
     {
+      description: [
+        'Propose one PR per minor release stream for Talos/Kubernetes, instead',
+        'of jumping straight to latest - these must be upgraded one minor',
+        'version at a time, so give tuppr/us a PR per intermediate step',
+      ],
+      matchDatasources: [
+        'docker',
+      ],
+      matchPackageNames: [
+        'ghcr.io/siderolabs/installer',
+        'ghcr.io/siderolabs/kubelet',
+      ],
+      separateMultipleMinor: true,
+    },
+    {
+      description: [
+        'Propose one PR per minor release stream for Longhorn, instead of',
+        'jumping straight to latest',
+      ],
+      matchDatasources: [
+        'helm',
+      ],
+      matchPackageNames: [
+        'longhorn',
+      ],
+      separateMultipleMinor: true,
+    },
+    {
       matchDatasources: [
         'docker',
       ],
