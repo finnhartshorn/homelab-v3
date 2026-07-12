@@ -5,9 +5,11 @@ kind: KubernetesUpgrade
 metadata:
   name: cluster
 spec:
-  # Pinned to the version currently running on all nodes: bump this by hand,
-  # one minor version at a time, following the supported upgrade path.
+  # Kept in lockstep with talconfig.yaml via the shared renovate depName below.
+  # Renovate proposes the latest available tag, not the next sequential minor -
+  # only merge a step at a time, following the supported upgrade path.
   kubernetes:
+    # renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
     version: v1.32.1
 
   healthChecks:
