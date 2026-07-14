@@ -18,5 +18,8 @@ spec:
     remediation:
       retries: 3
   values:
+    # 2 replicas so a standby survives on another node if the leader's node
+    # reboots mid-upgrade (only one is active at a time via leader election).
+    replicaCount: 2
     talosServiceAccount:
       create: true

@@ -1,0 +1,82 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: tuppr-watchdog
+spec:
+  # 15 min before the nightly 01:00 maintenance window, so a reset lands in
+  # time to retry within that same window.
+  schedule: "45 0 * * *"
+  timeZone: "Australia/Sydney"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 3600
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: tuppr-watchdog
+        spec:
+          restartPolicy: Never
+          serviceAccountName: tuppr-watchdog
+          containers:
+            - name: tuppr-watchdog
+              # renovate: datasource=docker depName=alpine/k8s
+              image: docker.io/alpine/k8s:1.32.3
+              command:
+                - sh
+                - -c
+                - |
+                  set -eu
+
+                  MAX_RETRIES=3
+                  PREFIX="homelab.finnhartshorn.com"
+
+                  check_and_reset() {
+                    kind="$1"
+                    name="cluster"
+
+                    json=$(kubectl -n system-upgrade get "$kind" "$name" -o json 2>/dev/null) || {
+                      echo "$kind/$name: not found, skipping"
+                      return
+                    }
+
+                    phase=$(echo "$json" | jq -r '.status.phase // ""')
+                    generation=$(echo "$json" | jq -r '.metadata.generation')
+                    watchdog_gen=$(echo "$json" | jq -r --arg k "${PREFIX}/watchdog-generation" '.metadata.annotations[$k] // ""')
+                    watchdog_retries=$(echo "$json" | jq -r --arg k "${PREFIX}/watchdog-retries" '.metadata.annotations[$k] // "0"')
+
+                    if [ "$generation" != "$watchdog_gen" ]; then
+                      watchdog_retries=0
+                    fi
+
+                    echo "$kind/$name: phase=$phase generation=$generation watchdog_retries=$watchdog_retries"
+
+                    if [ "$phase" != "Failed" ]; then
+                      echo "$kind/$name: not Failed, nothing to do"
+                      return
+                    fi
+
+                    if [ "$watchdog_retries" -ge "$MAX_RETRIES" ]; then
+                      echo "$kind/$name: already retried $watchdog_retries/$MAX_RETRIES times for generation $generation - giving up, needs manual attention"
+                      return
+                    fi
+
+                    new_retries=$((watchdog_retries + 1))
+                    echo "$kind/$name: Failed - resetting (attempt $new_retries/$MAX_RETRIES)"
+                    kubectl -n system-upgrade annotate "$kind" "$name" --overwrite \
+                      "tuppr.home-operations.com/reset=$(date +%s)" \
+                      "${PREFIX}/watchdog-generation=$generation" \
+                      "${PREFIX}/watchdog-retries=$new_retries"
+                  }
+
+                  check_and_reset talosupgrade
+                  check_and_reset kubernetesupgrade
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+                runAsNonRoot: true
