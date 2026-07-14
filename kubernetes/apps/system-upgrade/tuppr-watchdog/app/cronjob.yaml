@@ -80,3 +80,4 @@ spec:
                 capabilities:
                   drop: ["ALL"]
                 runAsNonRoot: true
+                runAsUser: 65534
