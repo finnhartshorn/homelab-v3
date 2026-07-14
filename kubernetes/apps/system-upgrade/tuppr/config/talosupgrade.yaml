@@ -18,6 +18,5 @@ spec:
       expr: status.conditions.exists(c, c.type == "Ready" && c.status == "True")
       timeout: 10m
 
-  # TEMPORARY: maintenance window cleared to manually trigger the v1.9.6 test
-  # run now. Restore the nightly 01:00-05:00 Australia/Sydney window after.
-  maintenance: {}
+  # TEMPORARY: maintenance omitted entirely to manually trigger the v1.9.6
+  # test run now. Restore the nightly 01:00-05:00 Australia/Sydney window after.
