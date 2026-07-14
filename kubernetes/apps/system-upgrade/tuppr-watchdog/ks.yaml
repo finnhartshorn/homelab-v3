@@ -5,6 +5,10 @@ kind: Kustomization
 metadata:
   name: &app tuppr-watchdog
   namespace: flux-system
+  # The watchdog script's shell variables (${PREFIX}) would otherwise collide
+  # with Flux's own ${VAR} postBuild substitution.
+  labels:
+    substitution.flux.home.arpa/disabled: "true"
 spec:
   targetNamespace: system-upgrade
   commonMetadata:
