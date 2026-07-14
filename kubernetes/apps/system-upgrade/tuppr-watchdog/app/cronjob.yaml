@@ -39,7 +39,7 @@ spec:
                     kind="$1"
                     name="cluster"
 
-                    json=$(kubectl -n system-upgrade get "$kind" "$name" -o json 2>/dev/null) || {
+                    json=$(kubectl get "$kind" "$name" -o json 2>/dev/null) || {
                       echo "$kind/$name: not found, skipping"
                       return
                     }
@@ -67,7 +67,7 @@ spec:
 
                     new_retries=$((watchdog_retries + 1))
                     echo "$kind/$name: Failed - resetting (attempt $new_retries/$MAX_RETRIES)"
-                    kubectl -n system-upgrade annotate "$kind" "$name" --overwrite \
+                    kubectl annotate "$kind" "$name" --overwrite \
                       "tuppr.home-operations.com/reset=$(date +%s)" \
                       "${PREFIX}/watchdog-generation=$generation" \
                       "${PREFIX}/watchdog-retries=$new_retries"

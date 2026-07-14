@@ -4,8 +4,10 @@ kind: ServiceAccount
 metadata:
   name: tuppr-watchdog
 ---
+# talosupgrades/kubernetesupgrades are cluster-scoped (not namespaced), so
+# this needs a ClusterRole/ClusterRoleBinding rather than Role/RoleBinding.
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
   name: tuppr-watchdog
 rules:
@@ -15,13 +17,14 @@ rules:
     verbs: ["get", "patch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
   name: tuppr-watchdog
 subjects:
   - kind: ServiceAccount
     name: tuppr-watchdog
+    namespace: system-upgrade
 roleRef:
-  kind: Role
+  kind: ClusterRole
   name: tuppr-watchdog
   apiGroup: rbac.authorization.k8s.io
