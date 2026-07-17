@@ -87,7 +87,6 @@
         'astral-sh/uv',
         'mikefarah/yq',
         'fluxcd/flux2',
-        'helm/helm',
         'budimanjojo/talhelper',
         'go-task/task',
         'yannh/kubeconform',
@@ -107,6 +106,23 @@
         '/spegel/',
       ],
       matchUpdateTypes: [
+        'minor',
+        'patch',
+        'pin',
+        'digest',
+      ],
+      automerge: true,
+    },
+    {
+      description: [
+        'Auto merge helm/helmfile CLI tooling, including majors',
+      ],
+      matchPackageNames: [
+        'helm/helm',
+        'helmfile/helmfile',
+      ],
+      matchUpdateTypes: [
+        'major',
         'minor',
         'patch',
         'pin',
