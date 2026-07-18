@@ -1,0 +1,77 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tuppr-log-capture
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tuppr-log-capture
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tuppr-log-capture
+    spec:
+      serviceAccountName: tuppr-log-capture
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: tuppr-log-capture
+          # renovate: datasource=docker depName=alpine/k8s
+          image: docker.io/alpine/k8s:1.32.3
+          command:
+            - sh
+            - -c
+            - |
+              set -u
+
+              # tuppr deletes each upgrade Job the moment it hits a terminal
+              # state (success or backoffLimit), so a failed run's stdout is
+              # gone within seconds unless something is already watching for
+              # the pod and tailing it before that delete lands. This loop
+              # does that: watch for tuppr-owned pods and stream their logs
+              # to our own stdout, which - unlike the ephemeral job pod - is
+              # retained until this container itself restarts.
+              NS=system-upgrade
+              SEEN=/tmp/seen
+              mkdir -p "$SEEN"
+
+              while true; do
+                kubectl get pods -n "$NS" -l app.kubernetes.io/part-of=tuppr \
+                  -w -o go-template='{{.metadata.name}}{{"\n"}}' 2>/dev/null |
+                while read -r name; do
+                  [ -z "$name" ] && continue
+                  marker="$SEEN/$name"
+                  [ -e "$marker" ] && continue
+                  touch "$marker"
+                  echo "### $(date -u +%FT%TZ) capturing logs for pod/$name"
+                  kubectl logs -n "$NS" -f "$name" --all-containers=true --prefix=true 2>&1 &
+                done
+                echo "### $(date -u +%FT%TZ) watch stream ended, restarting in 5s"
+                sleep 5
+              done
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              memory: 256Mi
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
