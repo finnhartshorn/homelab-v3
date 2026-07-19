@@ -6,6 +6,7 @@ resources:
   - ./tuppr/ks.yaml
   - ./tuppr-watchdog/ks.yaml
   - ./tuppr-log-capture/ks.yaml
+  - ./etcd-health-watcher/ks.yaml
 components:
   - ../../flux/components/namespace
 patches:

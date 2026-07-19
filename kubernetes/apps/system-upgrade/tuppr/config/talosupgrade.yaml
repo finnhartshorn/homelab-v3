@@ -18,6 +18,19 @@ spec:
       expr: status.conditions.exists(c, c.type == "Ready" && c.status == "True")
       timeout: 10m
 
+    # kubelet reports Node Ready again within seconds of a control-plane
+    # reboot, well before etcd's raft group has actually restabilised -
+    # that gap let tuppr start upgrading the next node straight into an
+    # etcd that was still timing out requests. etcd-health-watcher polls
+    # kube-apiserver's /healthz/etcd directly on each node (bypassing the
+    # load-balanced VIP) and publishes the result here every ~10s.
+    - apiVersion: v1
+      kind: ConfigMap
+      name: etcd-health
+      namespace: system-upgrade
+      expr: object.data.healthy == "true"
+      timeout: 10m
+
   maintenance:
     windows:
       - start: "0 1 * * *"

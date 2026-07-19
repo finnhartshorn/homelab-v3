@@ -1,0 +1,98 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: etcd-health-watcher
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: etcd-health-watcher
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: etcd-health-watcher
+    spec:
+      serviceAccountName: etcd-health-watcher
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: etcd-health-watcher
+          # renovate: datasource=docker depName=alpine/k8s
+          image: docker.io/alpine/k8s:1.32.3
+          env:
+            - name: HOME
+              value: /tmp
+          command:
+            - sh
+            - -c
+            - |
+              set -u
+
+              # tuppr's own healthChecks only see status.conditions on Node -
+              # kubelet reports Ready again within seconds of a control-plane
+              # node rebooting, well before etcd's raft group has actually
+              # restabilised (leader re-election / log catch-up). That gap is
+              # what let tuppr start upgrading the next node straight into an
+              # etcd that was still timing out requests (seen firsthand: a
+              # `kubectl logs` against the upgrade job pod returned
+              # "etcdserver: request timed out" right after a control-plane
+              # reboot). kube-apiserver's own /healthz/etcd, queried directly
+              # per-node rather than through the load-balanced VIP, reflects
+              # that far more honestly than Node readiness does - so publish
+              # it as a ConfigMap tuppr's healthChecks can gate on.
+              NS=system-upgrade
+              CM=etcd-health
+
+              while true; do
+                ips=$(kubectl get nodes -o jsonpath='{range .items[*]}{.status.addresses[?(@.type=="InternalIP")].address}{"\n"}{end}' 2>/dev/null)
+
+                if [ -z "$ips" ]; then
+                  healthy=false
+                  detail="could not list nodes"
+                else
+                  healthy=true
+                  detail=""
+                  for ip in $ips; do
+                    out=$(kubectl --request-timeout=5s --server="https://$ip:6443" get --raw /healthz/etcd 2>&1)
+                    if [ "$out" != "ok" ]; then
+                      healthy=false
+                      detail="$detail $ip=$out;"
+                    fi
+                  done
+                fi
+
+                ts=$(date -u +%FT%TZ)
+                kubectl -n "$NS" create configmap "$CM" \
+                  --from-literal=healthy="$healthy" \
+                  --from-literal=checkedAt="$ts" \
+                  --from-literal=detail="$detail" \
+                  --dry-run=client -o yaml | kubectl apply -f - >/dev/null
+
+                echo "### $ts healthy=$healthy${detail:+ detail:$detail}"
+                sleep 10
+              done
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}

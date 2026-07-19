@@ -1,0 +1,51 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: etcd-health-watcher
+---
+# Nodes are cluster-scoped, so discovering each control-plane node's own IP
+# (to hit its kube-apiserver directly, not the load-balanced VIP) needs a
+# ClusterRole rather than a namespaced Role.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: etcd-health-watcher
+rules:
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: etcd-health-watcher
+subjects:
+  - kind: ServiceAccount
+    name: etcd-health-watcher
+    namespace: system-upgrade
+roleRef:
+  kind: ClusterRole
+  name: etcd-health-watcher
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: etcd-health-watcher
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "create", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: etcd-health-watcher
+subjects:
+  - kind: ServiceAccount
+    name: etcd-health-watcher
+roleRef:
+  kind: Role
+  name: etcd-health-watcher
+  apiGroup: rbac.authorization.k8s.io
