@@ -27,8 +27,8 @@ spec:
         containers:
           app:
             image:
-              repository: quay.io/influxdb/influxdb3-core
-              tag: latest
+              repository: docker.io/library/influxdb
+              tag: 3.10.3-core
             args:
               - serve
               - --node-id=homelab
