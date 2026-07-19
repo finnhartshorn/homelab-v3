@@ -24,6 +24,15 @@ spec:
   values:
     defaultSettings:
       concurrentAutomaticEngineUpgradePerNodeLimit: 1
+      # node3 had 7 volumes degraded at once, all rebuilding in parallel onto
+      # the same already-overloaded node (up to 5 concurrent per the old
+      # default) - each rebuild streams a full replica's data with only a
+      # 30s file-sync timeout, so contention from stacking several at once
+      # was pushing transfers past that timeout and failing with EOF, which
+      # just triggered an immediate retry into the same pile-up. Capping to
+      # 1 lets rebuilds queue instead of fighting each other for the same
+      # disk/CPU.
+      concurrentReplicaRebuildPerNodeLimit: 1
       # CSI sidecars had no resource requests at all, so the scheduler treated
       # them as free to stack anywhere - a contributor to node3 ending up with
       # far more pods than node1/node2. One JSON blob covers every
