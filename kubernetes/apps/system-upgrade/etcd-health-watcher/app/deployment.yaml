@@ -50,6 +50,8 @@ spec:
               # it as a ConfigMap tuppr's healthChecks can gate on.
               NS=system-upgrade
               CM=etcd-health
+              SA_DIR=/var/run/secrets/kubernetes.io/serviceaccount
+              CA="$SA_DIR/ca.crt"
 
               while true; do
                 ips=$(kubectl get nodes -o jsonpath='{range .items[*]}{.status.addresses[?(@.type=="InternalIP")].address}{"\n"}{end}' 2>/dev/null)
@@ -60,8 +62,14 @@ spec:
                 else
                   healthy=true
                   detail=""
+                  # --server alone drops the in-cluster CA/token entirely
+                  # (kubectl falls back to interactive auth and hangs on
+                  # EOF) - pass them explicitly so each node is queried with
+                  # the same ServiceAccount identity regardless. Re-read the
+                  # token every cycle since it's periodically rotated.
+                  TOKEN=$(cat "$SA_DIR/token")
                   for ip in $ips; do
-                    out=$(kubectl --request-timeout=5s --server="https://$ip:6443" get --raw /healthz/etcd 2>&1)
+                    out=$(kubectl --request-timeout=5s --server="https://$ip:6443" --certificate-authority="$CA" --token="$TOKEN" get --raw /healthz/etcd 2>&1)
                     if [ "$out" != "ok" ]; then
                       healthy=false
                       detail="$detail $ip=$out;"
