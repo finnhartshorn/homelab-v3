@@ -104,6 +104,8 @@
         '/flux-instance/',
         'external-dns',
         '/spegel/',
+        'code.forgejo.org/forgejo/runner',
+        'docker.io/docker',
       ],
       matchUpdateTypes: [
         'minor',
@@ -137,6 +139,9 @@
       matchPackageNames: [
         'cert-manager',
         'cilium',
+        'coredns',
+        'ghcr.io/coredns/charts/coredns',
+        'ghcr.io/home-operations/charts/tuppr',
       ],
       matchUpdateTypes: [
         'patch',
@@ -193,16 +198,33 @@
     },
     {
       description: [
-        'Propose one PR per minor release stream for Talos/Kubernetes, instead',
-        'of jumping straight to latest - these must be upgraded one minor',
-        'version at a time, so give tuppr/us a PR per intermediate step',
+        'Propose one PR per minor release stream for the Talos installer,',
+        'instead of jumping straight to latest - this must be upgraded one',
+        'minor version at a time',
       ],
       matchDatasources: [
         'docker',
       ],
       matchPackageNames: [
         'ghcr.io/siderolabs/installer',
+      ],
+      separateMultipleMinor: true,
+    },
+    {
+      description: [
+        'Keep the kubelet image and the alpine/k8s kubectl tooling image (used',
+        'by tuppr-watchdog/tuppr-log-capture) in sync, and propose one PR per',
+        'minor release stream instead of jumping straight to latest -',
+        'Kubernetes must be upgraded one minor version at a time, so give',
+        'tuppr/us a PR per intermediate step',
+      ],
+      groupName: 'Kubernetes',
+      matchDatasources: [
+        'docker',
+      ],
+      matchPackageNames: [
         'ghcr.io/siderolabs/kubelet',
+        'docker.io/alpine/k8s',
       ],
       separateMultipleMinor: true,
     },
