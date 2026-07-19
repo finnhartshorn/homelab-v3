@@ -25,7 +25,7 @@ spec:
           containers:
             - name: tuppr-watchdog
               # renovate: datasource=docker depName=alpine/k8s
-              image: docker.io/alpine/k8s:1.32.3
+              image: docker.io/alpine/k8s:1.32.13
               command:
                 - sh
                 - -c
