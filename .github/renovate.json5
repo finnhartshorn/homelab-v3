@@ -230,6 +230,21 @@
     },
     {
       description: [
+        'kubelet tags carry a "v" prefix that alpine/k8s tags do not, so their',
+        'version strings never match even at the same release - strip it so',
+        'the grouped Kubernetes PR title can render currentVersion -> newVersion',
+        'again once the two catch up to a shared version',
+      ],
+      matchDatasources: [
+        'docker',
+      ],
+      matchPackageNames: [
+        'ghcr.io/siderolabs/kubelet',
+      ],
+      extractVersion: '^v(?<version>.*)$',
+    },
+    {
+      description: [
         'Propose one PR per minor release stream for Longhorn, instead of',
         'jumping straight to latest',
       ],
