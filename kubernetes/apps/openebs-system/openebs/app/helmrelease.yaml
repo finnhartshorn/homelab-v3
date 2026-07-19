@@ -39,6 +39,12 @@ spec:
       localpv:
         image:
           registry: quay.io/
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            memory: 64Mi
       helperPod:
         image:
           registry: quay.io/

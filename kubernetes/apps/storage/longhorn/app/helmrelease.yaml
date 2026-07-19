@@ -24,6 +24,11 @@ spec:
   values:
     defaultSettings:
       concurrentAutomaticEngineUpgradePerNodeLimit: 1
+      # CSI sidecars had no resource requests at all, so the scheduler treated
+      # them as free to stack anywhere - a contributor to node3 ending up with
+      # far more pods than node1/node2. One JSON blob covers every
+      # system-managed CSI component (see Longhorn docs for the setting).
+      systemManagedCSIComponentsResourceLimits: '{"csi-attacher":{"requests":{"cpu":"10m","memory":"20Mi"}},"csi-provisioner":{"requests":{"cpu":"10m","memory":"20Mi"}},"csi-resizer":{"requests":{"cpu":"10m","memory":"20Mi"}},"csi-snapshotter":{"requests":{"cpu":"10m","memory":"20Mi"}},"longhorn-csi-plugin":{"requests":{"cpu":"10m","memory":"32Mi"}},"node-driver-registrar":{"requests":{"cpu":"10m","memory":"20Mi"}},"longhorn-liveness-probe":{"requests":{"cpu":"10m","memory":"20Mi"}}}'
     monitoring:
         enabled: true
         createPrometheusRules: false

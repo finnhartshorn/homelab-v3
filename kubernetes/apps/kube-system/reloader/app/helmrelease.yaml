@@ -27,3 +27,10 @@ spec:
       readOnlyRootFileSystem: true
       podMonitor:
         enabled: false
+      deployment:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            memory: 128Mi

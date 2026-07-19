@@ -6,3 +6,23 @@ dns01RecursiveNameservers: https://1.1.1.1:443/dns-query,https://1.0.0.1:443/dns
 dns01RecursiveNameserversOnly: true
 prometheus:
   enabled: false
+resources:
+  requests:
+    cpu: 10m
+    memory: 32Mi
+  limits:
+    memory: 128Mi
+webhook:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      memory: 64Mi
+cainjector:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 48Mi
+    limits:
+      memory: 128Mi

@@ -27,3 +27,9 @@ spec:
       enabled: true
       size: 2Gi
       storageClass: longhorn
+    resources:
+      requests:
+        cpu: 15m
+        memory: 192Mi
+      limits:
+        memory: 384Mi

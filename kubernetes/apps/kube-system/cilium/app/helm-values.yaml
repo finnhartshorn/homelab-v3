@@ -43,6 +43,12 @@ operator:
       enabled: false
   dashboards:
     enabled: true
+  resources:
+    requests:
+      cpu: 10m
+      memory: 48Mi
+    limits:
+      memory: 128Mi
 prometheus:
   enabled: true
   serviceMonitor:

@@ -24,6 +24,9 @@ spec:
       retries: 3
   values:
     resources:
+      requests:
+        cpu: 50m
+        memory: 512Mi
       limits:
         memory: 1Gi
 
@@ -64,6 +67,12 @@ spec:
             protocol: TCP
     whisper:
       enabled: true
+      resources:
+        requests:
+          cpu: 10m
+          memory: 128Mi
+        limits:
+          memory: 256Mi
     addons:
       codeserver:
         enabled: true
@@ -77,6 +86,12 @@ spec:
           mountPath: /data/config
         image:
           tag: 4.115.0
+        resources:
+          requests:
+            cpu: 10m
+            memory: 128Mi
+          limits:
+            memory: 256Mi
         ingress:
           enabled: true
           ingressClassName: internal
