@@ -25,7 +25,7 @@ cniConfig:
 
 nodes:
   - hostname: "node1"
-    ipAddress: "192.168.1.203"
+    ipAddress: "192.168.1.202"
     installDisk: "/dev/sdb"
     machineSpec:
       secureboot: false
@@ -33,10 +33,10 @@ nodes:
     controlPlane: true
     networkInterfaces:
       - deviceSelector:
-          hardwareAddr: "6c:0b:84:e1:2c:c3"
+          hardwareAddr: "54:bf:64:99:21:be"
         dhcp: false
         addresses:
-          - "192.168.1.203/24"
+          - "192.168.1.202/24"
         routes:
           - network: "0.0.0.0/0"
             gateway: "192.168.1.1"
