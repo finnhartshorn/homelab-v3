@@ -233,13 +233,19 @@
         'kubelet tags carry a "v" prefix that alpine/k8s tags do not, so their',
         'version strings never match even at the same release - strip it so',
         'the grouped Kubernetes PR title can render currentVersion -> newVersion',
-        'again once the two catch up to a shared version',
+        'again once the two catch up to a shared version.',
+        'Scoped to talconfig.yaml only (its kubernetesVersion field is bare) -',
+        'tuppr/config/kubernetesupgrade.yaml also tracks this depName but its',
+        'CRD requires the native "v"-prefixed tag, so it must not be stripped.',
       ],
       matchDatasources: [
         'docker',
       ],
       matchPackageNames: [
         'ghcr.io/siderolabs/kubelet',
+      ],
+      matchFileNames: [
+        'kubernetes/bootstrap/talos/talconfig.yaml',
       ],
       extractVersion: '^v(?<version>.*)$',
     },
