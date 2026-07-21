@@ -234,18 +234,16 @@
         'version strings never match even at the same release - strip it so',
         'the grouped Kubernetes PR title can render currentVersion -> newVersion',
         'again once the two catch up to a shared version.',
-        'Scoped to talconfig.yaml only (its kubernetesVersion field is bare) -',
-        'tuppr/config/kubernetesupgrade.yaml also tracks this depName but its',
-        'CRD requires the native "v"-prefixed tag, so it must not be stripped.',
+        'Kept global (not scoped to talconfig.yaml) so every occurrence of this',
+        'depName resolves to the same version identity and the grouped title',
+        'stays uniform - see the dedicated kubernetesupgrade.yaml manager below',
+        'for how the "v" prefix survives there despite this strip.',
       ],
       matchDatasources: [
         'docker',
       ],
       matchPackageNames: [
         'ghcr.io/siderolabs/kubelet',
-      ],
-      matchFileNames: [
-        'kubernetes/bootstrap/talos/talconfig.yaml',
       ],
       extractVersion: '^v(?<version>.*)$',
     },
@@ -488,6 +486,26 @@
         'datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)( repository=(?<registryUrl>\\S+))?\\n.+(:\\s|=)(&\\S+\\s)?(?<currentValue>\\S+)',
       ],
       datasourceTemplate: '{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}',
+    },
+    {
+      customType: 'regex',
+      description: [
+        'tuppr KubernetesUpgrade CRD requires the kubelet image tag with its',
+        'native "v" prefix, which the global ghcr.io/siderolabs/kubelet',
+        'extractVersion strip (kept for the grouped Kubernetes PR title, see',
+        'packageRules above) would otherwise remove. Match this field with',
+        'its own manager instead of the generic depName-comment one, with the',
+        '"v" as a literal outside the captured group, so it survives in the',
+        'file untouched no matter what stripped digits get written in.',
+      ],
+      managerFilePatterns: [
+        '/(^|/)kubernetes/apps/system-upgrade/tuppr/config/kubernetesupgrade\\.ya?ml$/',
+      ],
+      matchStrings: [
+        'version:\\s*v(?<currentValue>\\S+)',
+      ],
+      datasourceTemplate: 'docker',
+      depNameTemplate: 'ghcr.io/siderolabs/kubelet',
     },
   ],
 }
