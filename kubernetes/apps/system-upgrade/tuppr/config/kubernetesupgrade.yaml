@@ -11,7 +11,7 @@ spec:
   # Renovate proposes the latest available tag, not the next sequential minor -
   # only merge a step at a time, following the supported upgrade path.
   kubernetes:
-    version: v1.32.13
+    version: v1.33.13
 
   healthChecks:
     - apiVersion: v1
