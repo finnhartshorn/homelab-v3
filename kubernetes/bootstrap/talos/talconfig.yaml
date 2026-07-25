@@ -1,7 +1,9 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/budimanjojo/talhelper/master/pkg/config/schemas/talconfig.json
 ---
-# renovate: datasource=docker depName=ghcr.io/siderolabs/installer
-talosVersion: 1.13.7
+# Kept in lockstep with talosupgrade.yaml via a dedicated renovate manager
+# (see .github/renovate.json5) - talhelper requires the "v" prefix, which
+# the generic depName-comment convention used elsewhere would strip.
+talosVersion: v1.13.7
 # renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
 kubernetesVersion: 1.33.13
 

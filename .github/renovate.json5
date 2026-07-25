@@ -531,5 +531,41 @@
       datasourceTemplate: 'docker',
       depNameTemplate: 'ghcr.io/siderolabs/kubelet',
     },
+    {
+      customType: 'regex',
+      description: [
+        'talhelper requires the Talos installer version with its native "v"',
+        'prefix, which the global ghcr.io/siderolabs/installer extractVersion',
+        'strip (kept for the grouped Talos PR title, see packageRules above)',
+        'would otherwise remove. Match this field with its own manager instead',
+        'of the generic depName-comment one, with the "v" as a literal outside',
+        'the captured group, so it survives in the file untouched no matter',
+        'what stripped digits get written in.',
+      ],
+      managerFilePatterns: [
+        '/(^|/)kubernetes/bootstrap/talos/talconfig\\.ya?ml$/',
+      ],
+      matchStrings: [
+        'talosVersion:\\s*v(?<currentValue>\\S+)',
+      ],
+      datasourceTemplate: 'docker',
+      depNameTemplate: 'ghcr.io/siderolabs/installer',
+    },
+    {
+      customType: 'regex',
+      description: [
+        'tuppr TalosUpgrade CRD requires the installer image tag with its',
+        'native "v" prefix - same treatment as talconfig.yaml above and the',
+        'KubernetesUpgrade CRD manager above.',
+      ],
+      managerFilePatterns: [
+        '/(^|/)kubernetes/apps/system-upgrade/tuppr/config/talosupgrade\\.ya?ml$/',
+      ],
+      matchStrings: [
+        'version:\\s*v(?<currentValue>\\S+)',
+      ],
+      datasourceTemplate: 'docker',
+      depNameTemplate: 'ghcr.io/siderolabs/installer',
+    },
   ],
 }
