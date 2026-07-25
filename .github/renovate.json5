@@ -182,11 +182,16 @@
     },
     {
       description: [
-        'Talos Group',
+        'Talos Group - covers both the docker-sourced installer/talosctl',
+        'images and the aqua-sourced talosctl CLI pinned in .mise.toml, so',
+        'a Talos release produces a single combined PR instead of one per',
+        'datasource',
       ],
       groupName: 'Talos',
       matchDatasources: [
         'docker',
+        'github-releases',
+        'github-tags',
       ],
       group: {
         commitMessageTopic: '{{{groupName}}} group',
@@ -194,7 +199,26 @@
       matchPackageNames: [
         '/siderolabs/talosctl/',
         '/siderolabs/installer/',
+        'siderolabs/talos',
       ],
+    },
+    {
+      description: [
+        'installer/talosctl docker tags carry a "v" prefix that the aqua-',
+        'sourced siderolabs/talos package does not, so their version strings',
+        'never match even at the same release - strip it so the grouped Talos',
+        'PR title can render currentVersion -> newVersion once all three',
+        'catch up to a shared version, same treatment as the Kubernetes group',
+        'below',
+      ],
+      matchDatasources: [
+        'docker',
+      ],
+      matchPackageNames: [
+        '/siderolabs/talosctl/',
+        '/siderolabs/installer/',
+      ],
+      extractVersion: '^v(?<version>.*)$',
     },
     {
       description: [
