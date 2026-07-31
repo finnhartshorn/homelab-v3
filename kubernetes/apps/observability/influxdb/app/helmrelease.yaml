@@ -29,7 +29,7 @@ spec:
           app:
             image:
               repository: docker.io/library/influxdb
-              tag: 3.10.3-core
+              tag: 3.10.5-core
             args:
               - serve
               - --node-id=homelab
