@@ -182,6 +182,28 @@
     },
     {
       description: [
+        'CoreDNS Group - the flux HelmRelease (depName "coredns") and the',
+        'bootstrap helmfile release (inline oci chart, depName',
+        '"ghcr.io/coredns/charts/coredns") are the same chart tracked under',
+        'two different depNames, producing duplicate PRs for every release -',
+        'group them into one. Both already report bare (non-"v"-prefixed)',
+        'versions, so no extractVersion strip is needed here unlike the',
+        'Kubernetes/Talos groups below',
+      ],
+      groupName: 'CoreDNS',
+      matchDatasources: [
+        'docker',
+      ],
+      group: {
+        commitMessageTopic: '{{{groupName}}} group',
+      },
+      matchPackageNames: [
+        'coredns',
+        'ghcr.io/coredns/charts/coredns',
+      ],
+    },
+    {
+      description: [
         'Talos Group - covers both the docker-sourced installer/talosctl',
         'images and the aqua-sourced talosctl CLI pinned in .mise.toml, so',
         'a Talos release produces a single combined PR instead of one per',
