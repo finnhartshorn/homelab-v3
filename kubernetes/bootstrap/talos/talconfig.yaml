@@ -5,7 +5,7 @@
 # the generic depName-comment convention used elsewhere would strip.
 talosVersion: v1.13.7
 # renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
-kubernetesVersion: 1.35.7
+kubernetesVersion: 1.36.3
 
 clusterName: kubernetes
 endpoint: https://192.168.1.222:6443
