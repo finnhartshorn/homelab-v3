@@ -117,6 +117,18 @@
     },
     {
       description: [
+        'Block docker.io/docker 29.7.0: CopyToContainer regression breaks',
+        'forgejo-runner checkout ("path escapes from parent" on the',
+        '/var/run -> /run symlink). See moby/moby#53258. Remove once a',
+        'released patch (29.7.1+) is confirmed to include the fix.',
+      ],
+      matchPackageNames: [
+        'docker.io/docker',
+      ],
+      allowedVersions: '!/^29\\.7\\.0/',
+    },
+    {
+      description: [
         'Auto merge helm/helmfile CLI tooling, including majors',
       ],
       matchPackageNames: [
