@@ -4,6 +4,8 @@ metadata:
   name: hypertable-maintenance-sql
 data:
   maintain.sql: |
+    CREATE EXTENSION IF NOT EXISTS timescaledb;
+
     GRANT USAGE ON SCHEMA public TO grafana_ro;
     GRANT SELECT ON ALL TABLES IN SCHEMA public TO grafana_ro;
     ALTER DEFAULT PRIVILEGES FOR ROLE telegraf IN SCHEMA public GRANT SELECT ON TABLES TO grafana_ro;
