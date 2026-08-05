@@ -21,7 +21,7 @@ data:
         WHERE schemaname = 'public'
           AND tablename NOT IN (SELECT hypertable_name FROM timescaledb_information.hypertables)
       LOOP
-        EXECUTE format('SELECT create_hypertable(%L, %L, migrate_data => true);', r.tablename, 'time');
+        EXECUTE format('SELECT create_hypertable(%L::regclass, %L, migrate_data => true);', quote_ident(r.tablename), 'time');
       END LOOP;
 
       -- 2. Ensure every hypertable has a 90-day retention policy
@@ -32,7 +32,7 @@ data:
           WHERE j.proc_name = 'policy_retention' AND j.hypertable_name = h.hypertable_name
         )
       LOOP
-        EXECUTE format('SELECT add_retention_policy(%L, INTERVAL ''90 days'', if_not_exists => true);', r.hypertable_name);
+        EXECUTE format('SELECT add_retention_policy(%L::regclass, INTERVAL ''90 days'', if_not_exists => true);', quote_ident(r.hypertable_name));
       END LOOP;
 
       -- 3. Ensure every hypertable has compression enabled + a policy, segmented by its own tag columns
@@ -58,6 +58,6 @@ data:
           END IF;
         END IF;
 
-        EXECUTE format('SELECT add_compression_policy(%L, INTERVAL ''7 days'', if_not_exists => true);', r.hypertable_name);
+        EXECUTE format('SELECT add_compression_policy(%L::regclass, INTERVAL ''7 days'', if_not_exists => true);', quote_ident(r.hypertable_name));
       END LOOP;
     END $body$;
