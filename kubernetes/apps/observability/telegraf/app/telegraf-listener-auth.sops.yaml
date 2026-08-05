@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/v1.18.1-standalone-strict/secret-v1.json
+apiVersion: v1
+kind: Secret
+metadata:
+  name: telegraf-listener-auth
+  namespace: observability
+stringData:
+  TELEGRAF_LISTENER_TOKEN: ENC[AES256_GCM,data:C/bi/AflRFnwF4XkwaR3RrbF2wY5+cw6zNVWzjGdYhLujcARnybym77zcUk=,iv:tEvkopzCIcXQM5jrkfOqwISeiiK4I91fFWjVAG8g8sw=,tag:AbfWVhMUe09vBuEFyCuNJg==,type:str]
+sops:
+  age:
+    - recipient: age13582xjhh7tpn3qsqktzukcdm04cnrn8fw9jhuv647jtqhzd20vaq4xtqe2
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBPdTQ4a05CMytWOGlxNkNO
+        T013Um9FVkl0SEwwYm53S0ZxUE9HSHBYYVNzClB6NXFBcFFPbmtCV2pnUU9JTVo1
+        L0ZRUGl4eHo0cFJZNFlCV2JVUEg4cHcKLS0tIEFRVXNRRm9sVVQwc3lxUWFPQlZ4
+        K1dBUUxWOW9nU1J5bVdqbmFGRkxZT0EKJlIx5jFwhRAZQjUtYfNJUaGd7R4xEo+Y
+        +t5VNNQvvelvBkM+0e1o36c0MiZqdD5Cx0zEfk/HX9A6V/3fU6Cg3Q==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2026-08-05T07:28:29Z"
+  mac: ENC[AES256_GCM,data:6zacw0/oM9qnu1xP3tBpcJkMpmG42TUu5Zr408ac+74h+GC+4J3ehWwgOkKaTIIJFTk2YfaM9tn1Do43YpygbY8URGEc/o1m/53WK+M32wc1Jn01pDAwB2UvKTueejqm6phwvvNE1M8/tz1m9qTaa1Gzj+GU+UBeNbCrOye9TPc=,iv:3mk5jmhHKRK1x1bhLT05ZawMtlf50VLyxymO0R9q3s4=,tag:NaiULOHEvhAQkKlyVjtT2Q==,type:str]
+  encrypted_regex: ^(data|stringData)$
+  mac_only_encrypted: true
+  version: 3.12.2

@@ -5,3 +5,5 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./configmap.yaml
+  - ./telegraf-listener-auth.sops.yaml
+  - ./telegraf-db-credentials.sops.yaml

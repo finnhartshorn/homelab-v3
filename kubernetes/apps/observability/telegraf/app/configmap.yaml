@@ -19,8 +19,16 @@ data:
     [[inputs.prometheus]]
       urls = ["http://longhorn-backend.longhorn-system.svc.cluster.local:9500/metrics"]
 
+    [[inputs.influxdb_v2_listener]]
+      service_address = ":8186"
+      token = "$${TELEGRAF_LISTENER_TOKEN}"
+
     [[outputs.influxdb_v2]]
       urls = ["http://influxdb.observability.svc.cluster.local:8086"]
       token = "$${INFLUXDB3_TOKEN}"
       organization = ""
       bucket = "telegraf"
+
+    [[outputs.postgresql]]
+      connection = "host=postgres-rw.database.svc.cluster.local port=5432 user=telegraf password=$${TELEGRAF_DB_PASSWORD} dbname=telegraf sslmode=require"
+      tags_as_foreign_keys = false

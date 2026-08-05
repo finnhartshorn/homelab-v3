@@ -27,6 +27,17 @@ spec:
             envFrom:
               - secretRef:
                   name: influxdb-auth
+            env:
+              TELEGRAF_DB_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: telegraf-db-credentials
+                    key: password
+              TELEGRAF_LISTENER_TOKEN:
+                valueFrom:
+                  secretKeyRef:
+                    name: telegraf-listener-auth
+                    key: TELEGRAF_LISTENER_TOKEN
             resources:
               requests:
                 cpu: 50m
@@ -34,6 +45,23 @@ spec:
               limits:
                 cpu: 200m
                 memory: 256Mi
+    service:
+      main:
+        controller: main
+        ports:
+          influxv2:
+            port: 8186
+    ingress:
+      main:
+        enabled: true
+        hosts:
+          - host: "telegraf.${SECRET_DOMAIN}"
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: main
+                  port: influxv2
     persistence:
       config:
         type: configMap
