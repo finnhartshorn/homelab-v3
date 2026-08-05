@@ -13,8 +13,9 @@ spec:
     name: postgres-superuser-credentials
 
   storage:
-    size: 10Gi
-    storageClass: openebs-hostpath
+    size: 50Gi
+    storageClass: openebs-hostpath-quota
+    resizeInUseVolumes: false
 
   affinity:
     podAntiAffinityType: required
