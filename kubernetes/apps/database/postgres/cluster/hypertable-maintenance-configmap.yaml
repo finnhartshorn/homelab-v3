@@ -13,13 +13,51 @@ data:
     DO $body$
     DECLARE
       r record;
+      seg_cols text;
     BEGIN
+      -- 1. Convert any plain tables Telegraf created into hypertables
       FOR r IN
         SELECT tablename FROM pg_tables
         WHERE schemaname = 'public'
           AND tablename NOT IN (SELECT hypertable_name FROM timescaledb_information.hypertables)
       LOOP
         EXECUTE format('SELECT create_hypertable(%L, %L, migrate_data => true);', r.tablename, 'time');
-        -- Phase 4 will add: EXECUTE format('SELECT add_retention_policy(%L, INTERVAL ''90 days'');', r.tablename);
+      END LOOP;
+
+      -- 2. Ensure every hypertable has a 90-day retention policy
+      FOR r IN
+        SELECT h.hypertable_name FROM timescaledb_information.hypertables h
+        WHERE NOT EXISTS (
+          SELECT 1 FROM timescaledb_information.jobs j
+          WHERE j.proc_name = 'policy_retention' AND j.hypertable_name = h.hypertable_name
+        )
+      LOOP
+        EXECUTE format('SELECT add_retention_policy(%L, INTERVAL ''90 days'', if_not_exists => true);', r.hypertable_name);
+      END LOOP;
+
+      -- 3. Ensure every hypertable has compression enabled + a policy, segmented by its own tag columns
+      FOR r IN
+        SELECT h.hypertable_name FROM timescaledb_information.hypertables h
+        WHERE NOT EXISTS (
+          SELECT 1 FROM timescaledb_information.jobs j
+          WHERE j.proc_name = 'policy_compression' AND j.hypertable_name = h.hypertable_name
+        )
+      LOOP
+        IF NOT (SELECT compression_enabled FROM timescaledb_information.hypertables WHERE hypertable_name = r.hypertable_name) THEN
+          SELECT string_agg(quote_ident(column_name), ',' ORDER BY ordinal_position)
+          INTO seg_cols
+          FROM information_schema.columns
+          WHERE table_schema = 'public' AND table_name = r.hypertable_name
+            AND column_name <> 'time'
+            AND data_type NOT IN ('double precision','real','integer','bigint','smallint','numeric','boolean');
+
+          IF seg_cols IS NOT NULL THEN
+            EXECUTE format('ALTER TABLE %I SET (timescaledb.compress, timescaledb.compress_segmentby = %L, timescaledb.compress_orderby = ''time DESC'');', r.hypertable_name, seg_cols);
+          ELSE
+            EXECUTE format('ALTER TABLE %I SET (timescaledb.compress, timescaledb.compress_orderby = ''time DESC'');', r.hypertable_name);
+          END IF;
+        END IF;
+
+        EXECUTE format('SELECT add_compression_policy(%L, INTERVAL ''7 days'', if_not_exists => true);', r.hypertable_name);
       END LOOP;
     END $body$;
