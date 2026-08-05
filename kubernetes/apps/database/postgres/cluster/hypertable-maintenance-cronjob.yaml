@@ -1,0 +1,49 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hypertable-maintenance
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 3600
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: hypertable-maintenance
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: hypertable-maintenance
+              image: ghcr.io/cloudnative-pg/postgresql:18.4-system-trixie
+              command: ["psql"]
+              args:
+                - "-v"
+                - "ON_ERROR_STOP=1"
+                - "-h"
+                - "postgres-rw.database.svc.cluster.local"
+                - "-d"
+                - "telegraf"
+                - "-f"
+                - "/scripts/maintain.sql"
+              env:
+                - name: PGUSER
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-superuser-credentials
+                      key: username
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-superuser-credentials
+                      key: password
+              volumeMounts:
+                - name: sql
+                  mountPath: /scripts
+          volumes:
+            - name: sql
+              configMap:
+                name: hypertable-maintenance-sql

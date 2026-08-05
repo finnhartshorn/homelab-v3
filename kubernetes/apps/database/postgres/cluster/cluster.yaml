@@ -55,6 +55,14 @@ spec:
         login: false
       - name: windmill_user
         login: false
+      - name: telegraf
+        login: true
+        passwordSecret:
+          name: telegraf-db-credentials
+      - name: grafana_ro
+        login: true
+        passwordSecret:
+          name: grafana-ro-credentials
 
   backup:
     barmanObjectStore:

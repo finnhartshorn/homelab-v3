@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hypertable-maintenance-sql
+data:
+  maintain.sql: |
+    GRANT USAGE ON SCHEMA public TO grafana_ro;
+    GRANT SELECT ON ALL TABLES IN SCHEMA public TO grafana_ro;
+    ALTER DEFAULT PRIVILEGES FOR ROLE telegraf IN SCHEMA public GRANT SELECT ON TABLES TO grafana_ro;
+
+    DO $$
+    DECLARE
+      r record;
+    BEGIN
+      FOR r IN
+        SELECT tablename FROM pg_tables
+        WHERE schemaname = 'public'
+          AND tablename NOT IN (SELECT hypertable_name FROM timescaledb_information.hypertables)
+      LOOP
+        EXECUTE format('SELECT create_hypertable(%L, %L, migrate_data => true);', r.tablename, 'time');
+        -- Phase 4 will add: EXECUTE format('SELECT add_retention_policy(%L, INTERVAL ''90 days'');', r.tablename);
+      END LOOP;
+    END $$;

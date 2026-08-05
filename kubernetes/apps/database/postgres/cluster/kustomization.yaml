@@ -6,9 +6,14 @@ resources:
   - ./minio-secret.sops.yaml
   - ./windmill-db-credentials.sops.yaml
   - ./quizzer-db-credentials.sops.yaml
+  - ./telegraf-db-credentials.sops.yaml
+  - ./grafana-ro-credentials.sops.yaml
   - ./postgres-superuser-credentials.sops.yaml
   - ./cluster.yaml
   - ./scheduled-backup.yaml
   - ./database-windmill.yaml
   - ./database-quizzer.yaml
+  - ./database-telegraf.yaml
+  - ./hypertable-maintenance-configmap.yaml
+  - ./hypertable-maintenance-cronjob.yaml
   - ./loadbalancer.yaml
