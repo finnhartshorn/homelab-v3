@@ -32,6 +32,12 @@ spec:
     admin:
       existingSecret: grafana-admin
     envFromSecret: influxdb-auth
+    envFromSecrets:
+      - name: grafana-ro-credentials
+        prefix: GRAFANA_RO_
+    sidecar:
+      dashboards:
+        enabled: true
     grafana.ini:
       analytics:
         check_for_updates: false
@@ -53,6 +59,18 @@ spec:
               httpHeaderName1: Authorization
             secureJsonData:
               httpHeaderValue1: Bearer $INFLUXDB3_TOKEN
+          - name: Postgres-Telegraf
+            uid: postgres-telegraf
+            type: postgres
+            access: proxy
+            url: postgres-ro.database.svc.cluster.local:5432
+            database: telegraf
+            user: grafana_ro
+            jsonData:
+              sslmode: require
+              postgresVersion: 1800
+            secureJsonData:
+              password: $GRAFANA_RO_password
     ingress:
       enabled: true
       ingressClassName: internal
