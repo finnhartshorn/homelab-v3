@@ -14,6 +14,31 @@ data:
     [[inputs.prometheus]]
       urls = ["http://longhorn-backend.longhorn-system.svc.cluster.local:9500/metrics"]
 
+    [[inputs.kube_inventory]]
+      url = "https://kubernetes.default.svc"
+      bearer_token = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+      tls_ca = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+
+    # kubelet summary API, scraped per-node directly (not proxied through the
+    # apiserver) since each kubelet only reports stats for its own node.
+    # node1
+    [[inputs.kubernetes]]
+      url = "https://192.168.1.202:10250"
+      bearer_token = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+      insecure_skip_verify = true
+
+    # node2
+    [[inputs.kubernetes]]
+      url = "https://192.168.1.204:10250"
+      bearer_token = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+      insecure_skip_verify = true
+
+    # node3
+    [[inputs.kubernetes]]
+      url = "https://192.168.1.201:10250"
+      bearer_token = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+      insecure_skip_verify = true
+
     [[inputs.influxdb_v2_listener]]
       service_address = ":8186"
       token = "$${TELEGRAF_LISTENER_TOKEN}"

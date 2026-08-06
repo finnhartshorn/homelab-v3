@@ -17,6 +17,9 @@ spec:
         name: bjw-s
         namespace: flux-system
   values:
+    serviceAccount:
+      create: false
+      name: telegraf
     controllers:
       main:
         containers:
