@@ -67,6 +67,7 @@ spec:
             database: telegraf
             user: grafana_ro
             jsonData:
+              database: telegraf
               sslmode: require
               postgresVersion: 1800
             secureJsonData:
