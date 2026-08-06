@@ -4,7 +4,18 @@ kind: Cluster
 metadata:
   name: postgres
 spec:
-  instances: 3
+  # Applying this spec alone does NOT migrate the surviving instances onto
+  # the new storageClass/nodeSelector: CNPG never recreates a running
+  # instance's PVC just because storageClass/nodeSelector changed (a PVC is
+  # already bound to a PV; StorageClass only matters at provisioning time -
+  # see https://github.com/cloudnative-pg/cloudnative-pg/issues/7639).
+  # Applying this alone only scales 3->2 (removes the highest-ordinal
+  # instance, postgres-3 on node3). Moving the two survivors onto the new
+  # NVMe storage/nodes then requires a manual, one-at-a-time PVC+Pod
+  # delete-and-recreate per instance (replica first, promote, then old
+  # primary) so each rejoins via streaming replication instead of losing
+  # data.
+  instances: 2
 
   imageName: ghcr.io/cloudnative-pg/postgresql:18.4-system-trixie
 
@@ -14,12 +25,14 @@ spec:
 
   storage:
     size: 50Gi
-    storageClass: openebs-hostpath-quota
+    storageClass: openebs-hostpath-nvme-quota
     resizeInUseVolumes: false
 
   affinity:
     podAntiAffinityType: required
     topologyKey: kubernetes.io/hostname
+    nodeSelector:
+      node-role.kubernetes.io/postgres: "true"
 
   resources:
     requests:
