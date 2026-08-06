@@ -33,6 +33,14 @@ nodes:
       secureboot: false
     talosImageURL: factory.talos.dev/installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245
     controlPlane: true
+    nodeLabels:
+      # talhelper only sets this default when nodeLabels is unset for a VIP
+      # node - since we need a custom label too, it must be listed explicitly
+      # here or it's dropped.
+      node.kubernetes.io/exclude-from-external-load-balancers: ""
+      node-role.kubernetes.io/postgres: "true"
+    patches:
+      - "@./patches/node1/user-volume-postgres.yaml"
     networkInterfaces:
       - deviceSelector:
           hardwareAddr: "54:bf:64:99:21:be"
@@ -53,6 +61,14 @@ nodes:
       secureboot: false
     talosImageURL: factory.talos.dev/installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245
     controlPlane: true
+    nodeLabels:
+      # talhelper only sets this default when nodeLabels is unset for a VIP
+      # node - since we need a custom label too, it must be listed explicitly
+      # here or it's dropped.
+      node.kubernetes.io/exclude-from-external-load-balancers: ""
+      node-role.kubernetes.io/postgres: "true"
+    patches:
+      - "@./patches/node2/user-volume-postgres.yaml"
     networkInterfaces:
       - deviceSelector:
           hardwareAddr: "6c:2b:59:d1:02:79"
@@ -100,4 +116,5 @@ controlPlane:
   patches:
     - "@./patches/controller/admission-controller-patch.yaml"
     - "@./patches/controller/cluster.yaml"
+    - "@./patches/controller/user-volume-longhorn.yaml"
 

@@ -1,0 +1,7 @@
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: postgres
+provisioning:
+  diskSelector:
+    match: disk.transport == 'nvme'
+  minSize: 50GB
