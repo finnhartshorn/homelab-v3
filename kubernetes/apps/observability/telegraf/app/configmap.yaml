@@ -14,11 +14,15 @@ data:
     [[inputs.prometheus]]
       urls = ["http://longhorn-backend.longhorn-system.svc.cluster.local:9500/metrics"]
 
+    # namedrop excludes two metrics whose names exceed Postgres's 63-byte
+    # identifier limit, which breaks table create/lookup permanently.
     [[inputs.prometheus]]
       urls = ["http://external-ingress-nginx-controller-metrics.network.svc.cluster.local:10254/metrics"]
+      namedrop = ["nginx_ingress_controller_nginx_process_oldest_start_time_seconds", "nginx_ingress_controller_config_last_reload_successful_timestamp_seconds"]
 
     [[inputs.prometheus]]
       urls = ["http://internal-ingress-nginx-controller-metrics.network.svc.cluster.local:10254/metrics"]
+      namedrop = ["nginx_ingress_controller_nginx_process_oldest_start_time_seconds", "nginx_ingress_controller_config_last_reload_successful_timestamp_seconds"]
 
     # CoreDNS, Cilium and CNPG have no stable Service exposing their metrics
     # port (CoreDNS: kube-dns Service only covers 53; Cilium: cilium-agent
@@ -33,12 +37,17 @@ data:
       monitor_kubernetes_pods_port = 9153
       kubernetes_label_selector = "k8s-app=kube-dns"
 
+    # namedrop excludes Cilium's cilium_feature_*/cilium_operator_feature_*
+    # families: static build-time feature-flag gauges (not real time-series
+    # data) whose self-documenting names regularly exceed Postgres's 63-byte
+    # identifier limit and break table create/lookup permanently.
     [[inputs.prometheus]]
       monitor_kubernetes_pods = true
       monitor_kubernetes_pods_method = "settings"
       monitor_kubernetes_pods_namespace = "kube-system"
       monitor_kubernetes_pods_port = 9962
       kubernetes_label_selector = "k8s-app=cilium"
+      namedrop = ["cilium_feature_*"]
 
     [[inputs.prometheus]]
       monitor_kubernetes_pods = true
@@ -46,6 +55,7 @@ data:
       monitor_kubernetes_pods_namespace = "kube-system"
       monitor_kubernetes_pods_port = 9963
       kubernetes_label_selector = "io.cilium/app=operator"
+      namedrop = ["cilium_operator_feature_*"]
 
     [[inputs.prometheus]]
       monitor_kubernetes_pods = true
