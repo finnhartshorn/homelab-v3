@@ -1,0 +1,1929 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "panels": [],
+      "title": "Cluster Overview",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 1
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS \"Nodes Ready\"\nFROM (\n  SELECT DISTINCT ON (node_name) node_name, status\n  FROM kubernetes_node\n  WHERE condition = 'Ready'\n  ORDER BY node_name, time DESC\n) latest\nWHERE status = 'True'",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Nodes Ready",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 1
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT sum(allocatable_millicpu_cores) / 1000.0 AS \"Allocatable CPU (cores)\"\nFROM (\n  SELECT DISTINCT ON (node_name) node_name, allocatable_millicpu_cores\n  FROM kubernetes_node\n  WHERE allocatable_millicpu_cores IS NOT NULL\n  ORDER BY node_name, time DESC\n) latest",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT sum(allocatable_memory_bytes) AS \"Allocatable Memory\"\nFROM (\n  SELECT DISTINCT ON (node_name) node_name, allocatable_memory_bytes\n  FROM kubernetes_node\n  WHERE allocatable_memory_bytes IS NOT NULL\n  ORDER BY node_name, time DESC\n) latest",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Allocatable CPU / Memory",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 1
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS \"Deployments Unavailable\"\nFROM (\n  SELECT DISTINCT ON (deployment_name, namespace) deployment_name, namespace, replicas_unavailable\n  FROM kubernetes_deployment\n  ORDER BY deployment_name, namespace, time DESC\n) latest\nWHERE replicas_unavailable > 0",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Deployments Unavailable",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 1
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT count(DISTINCT pv_name) AS \"PersistentVolumes\"\nFROM kubernetes_persistentvolume\nWHERE $__timeFilter(time)",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT count(DISTINCT ingress_name) AS \"Ingresses\"\nFROM kubernetes_ingress\nWHERE $__timeFilter(time)",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "PersistentVolumes / Ingresses",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 6,
+      "panels": [],
+      "title": "Node Health",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "fillOpacity": 70,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "True": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "True"
+                },
+                "False": {
+                  "color": "red",
+                  "index": 1,
+                  "text": "False"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 6
+      },
+      "id": 7,
+      "options": {
+        "alignValue": "center",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT\n  time,\n  node_name || ' \u2014 ' || condition AS metric,\n  status AS value\nFROM kubernetes_node\nWHERE condition IS NOT NULL AND $__timeFilter(time)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Node Conditions",
+      "type": "state-timeline"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Capacity Memory"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Allocatable Memory"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 14
+      },
+      "id": 8,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT\n  node_name AS \"Node\",\n  capacity_millicpu_cores / 1000.0 AS \"Capacity CPU (cores)\",\n  allocatable_millicpu_cores / 1000.0 AS \"Allocatable CPU (cores)\",\n  capacity_memory_bytes AS \"Capacity Memory\",\n  allocatable_memory_bytes AS \"Allocatable Memory\",\n  capacity_pods AS \"Capacity Pods\",\n  allocatable_pods AS \"Allocatable Pods\"\nFROM (\n  SELECT DISTINCT ON (node_name) *\n  FROM kubernetes_node\n  WHERE capacity_millicpu_cores IS NOT NULL\n  ORDER BY node_name, time DESC\n) latest\nORDER BY node_name",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Node Capacity vs Allocatable",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 22
+      },
+      "id": 9,
+      "panels": [],
+      "title": "Node Resource Usage ($node)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 23
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, node_name AS metric, cpu_usage_nanocores / 1e9 AS value\nFROM kubernetes_node\nWHERE cpu_usage_nanocores IS NOT NULL AND $__timeFilter(time) AND node_name IN ($node)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "CPU Usage by Node",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 23
+      },
+      "id": 11,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, node_name AS metric, memory_working_set_bytes AS value\nFROM kubernetes_node\nWHERE memory_working_set_bytes IS NOT NULL AND $__timeFilter(time) AND node_name IN ($node)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Memory Usage (Working Set) by Node",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 31
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, node_name AS metric, (fs_used_bytes::float8 / NULLIF(fs_capacity_bytes, 0)) * 100 AS value\nFROM kubernetes_node\nWHERE fs_used_bytes IS NOT NULL AND $__timeFilter(time) AND node_name IN ($node)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Filesystem Usage % by Node",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 31
+      },
+      "id": 13,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    node_name,\n    (network_rx_bytes - lag(network_rx_bytes) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS rx_per_sec,\n    (network_tx_bytes - lag(network_tx_bytes) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS tx_per_sec\n  FROM kubernetes_node\n  WHERE network_rx_bytes IS NOT NULL AND $__timeFilter(time) AND node_name IN ($node)\n  WINDOW w AS (PARTITION BY node_name ORDER BY time)\n)\nSELECT time, node_name || ' rx' AS metric, rx_per_sec AS value FROM deltas\nUNION ALL\nSELECT time, node_name || ' tx' AS metric, tx_per_sec AS value FROM deltas\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Network I/O by Node",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 39
+      },
+      "id": 14,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, node_name || ' / ' || container_name AS metric, cpu_usage_nanocores / 1e9 AS value\nFROM kubernetes_system_container\nWHERE cpu_usage_nanocores IS NOT NULL AND $__timeFilter(time) AND node_name IN ($node)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, node_name || ' / ' || container_name AS metric, memory_working_set_bytes AS value\nFROM kubernetes_system_container\nWHERE memory_working_set_bytes IS NOT NULL AND $__timeFilter(time) AND node_name IN ($node)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Kubelet/Runtime Container Overhead",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 47
+      },
+      "id": 15,
+      "panels": [],
+      "title": "Pod Resource Usage ($namespace)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 48
+      },
+      "id": 16,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, pod_name AS metric, cpu_usage_nanocores / 1e9 AS value\nFROM kubernetes_pod_container\nWHERE cpu_usage_nanocores IS NOT NULL AND $__timeFilter(time) AND namespace IN ($namespace)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Pod CPU Usage",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 48
+      },
+      "id": 17,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, pod_name AS metric, memory_working_set_bytes AS value\nFROM kubernetes_pod_container\nWHERE memory_working_set_bytes IS NOT NULL AND $__timeFilter(time) AND namespace IN ($namespace)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Pod Memory Usage (Working Set)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Restarts"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "red",
+                      "value": 1
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 56
+      },
+      "id": 18,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT\n  pod_name AS \"Pod\",\n  container_name AS \"Container\",\n  namespace AS \"Namespace\",\n  restarts_total AS \"Restarts\",\n  phase AS \"Phase\"\nFROM (\n  SELECT DISTINCT ON (namespace, pod_name, container_name) *\n  FROM kubernetes_pod_container\n  WHERE restarts_total IS NOT NULL AND namespace IN ($namespace)\n  ORDER BY namespace, pod_name, container_name, time DESC\n) latest\nORDER BY \"Restarts\" DESC",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Pod Restarts",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 56
+      },
+      "id": 19,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name,\n    (rx_bytes - lag(rx_bytes) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS rx_per_sec,\n    (tx_bytes - lag(tx_bytes) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS tx_per_sec\n  FROM kubernetes_pod_network\n  WHERE $__timeFilter(time) AND namespace IN ($namespace)\n  WINDOW w AS (PARTITION BY pod_name ORDER BY time)\n)\nSELECT time, pod_name || ' rx' AS metric, rx_per_sec AS value FROM deltas\nUNION ALL\nSELECT time, pod_name || ' tx' AS metric, tx_per_sec AS value FROM deltas\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Pod Network I/O",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Used %"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "orange",
+                      "value": 80
+                    },
+                    {
+                      "color": "red",
+                      "value": 95
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 64
+      },
+      "id": 20,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT\n  pod_name AS \"Pod\",\n  volume_name AS \"Volume\",\n  namespace AS \"Namespace\",\n  round((used_bytes::numeric / NULLIF(capacity_bytes, 0)) * 100, 1) AS \"Used %\"\nFROM (\n  SELECT DISTINCT ON (namespace, pod_name, volume_name) *\n  FROM kubernetes_pod_volume\n  WHERE capacity_bytes IS NOT NULL AND namespace IN ($namespace)\n  ORDER BY namespace, pod_name, volume_name, time DESC\n) latest\nORDER BY \"Used %\" DESC",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Pod Volume Usage %",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 72
+      },
+      "id": 21,
+      "panels": [],
+      "title": "Cluster Objects",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Unavailable"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "red",
+                      "value": 1
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 73
+      },
+      "id": 22,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT\n  deployment_name AS \"Name\",\n  namespace AS \"Namespace\",\n  replicas_available AS \"Available\",\n  replicas_unavailable AS \"Unavailable\"\nFROM (\n  SELECT DISTINCT ON (namespace, deployment_name) *\n  FROM kubernetes_deployment\n  ORDER BY namespace, deployment_name, time DESC\n) latest\nORDER BY \"Namespace\", \"Name\" ",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Deployments",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 73
+      },
+      "id": 23,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT\n  service_name AS \"Name\",\n  namespace AS \"Namespace\",\n  cluster_ip AS \"Cluster IP\",\n  port AS \"Port\",\n  port_name AS \"Port Name\"\nFROM (\n  SELECT DISTINCT ON (namespace, service_name, port_name) *\n  FROM kubernetes_service\n  ORDER BY namespace, service_name, port_name, time DESC\n) latest\nORDER BY \"Namespace\", \"Name\" ",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Services",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 81
+      },
+      "id": 24,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT\n  ingress_name AS \"Name\",\n  namespace AS \"Namespace\",\n  host AS \"Host\",\n  backend_service_name AS \"Backend Service\",\n  tls AS \"TLS\"\nFROM (\n  SELECT DISTINCT ON (namespace, ingress_name, host) *\n  FROM kubernetes_ingress\n  ORDER BY namespace, ingress_name, host, time DESC\n) latest\nORDER BY \"Namespace\", \"Name\" ",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Ingresses",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 81
+      },
+      "id": 25,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT\n  pv_name AS \"Name\",\n  phase AS \"Phase\",\n  storageclass AS \"Storage Class\"\nFROM (\n  SELECT DISTINCT ON (pv_name) *\n  FROM kubernetes_persistentvolume\n  ORDER BY pv_name, time DESC\n) latest\nORDER BY \"Name\" ",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "PersistentVolumes",
+      "type": "table"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 42,
+  "tags": [
+    "kubernetes"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "datasource": {
+          "type": "postgres",
+          "uid": "postgres-telegraf"
+        },
+        "definition": "SELECT DISTINCT node_name FROM kubernetes_node WHERE node_name IS NOT NULL ORDER BY 1",
+        "includeAll": true,
+        "label": "Node",
+        "multi": true,
+        "name": "node",
+        "options": [],
+        "query": "SELECT DISTINCT node_name FROM kubernetes_node WHERE node_name IS NOT NULL ORDER BY 1",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "postgres",
+          "uid": "postgres-telegraf"
+        },
+        "definition": "SELECT DISTINCT namespace FROM kubernetes_pod_container WHERE namespace IS NOT NULL ORDER BY 1",
+        "includeAll": true,
+        "label": "Namespace",
+        "multi": true,
+        "name": "namespace",
+        "options": [],
+        "query": "SELECT DISTINCT namespace FROM kubernetes_pod_container WHERE namespace IS NOT NULL ORDER BY 1",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Kubernetes Cluster",
+  "uid": "k8s-cluster",
+  "version": 1,
+  "weekStart": ""
+}
