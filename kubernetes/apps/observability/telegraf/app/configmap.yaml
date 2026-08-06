@@ -18,6 +18,10 @@ data:
       url = "https://kubernetes.default.svc"
       bearer_token = "/var/run/secrets/kubernetes.io/serviceaccount/token"
       tls_ca = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+      # excludes the certificate collector, which requires cluster-wide read
+      # access to Secrets to scan TLS cert expiry - too broad a grant for
+      # what this input is here for.
+      resource_exclude = ["secrets"]
 
     # kubelet summary API, scraped per-node directly (not proxied through the
     # apiserver) since each kubelet only reports stats for its own node.

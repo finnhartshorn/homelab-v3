@@ -22,12 +22,16 @@ rules:
       - persistentvolumeclaims
       - resourcequotas
       - services
-      - endpoints
     verbs: ["get", "list"]
   - apiGroups: [""]
     resources:
       - nodes/stats
+      - nodes/proxy
     verbs: ["get"]
+  - apiGroups: ["discovery.k8s.io"]
+    resources:
+      - endpointslices
+    verbs: ["get", "list"]
   - apiGroups: ["apps"]
     resources:
       - daemonsets
