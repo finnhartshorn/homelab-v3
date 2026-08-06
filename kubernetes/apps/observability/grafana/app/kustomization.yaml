@@ -5,7 +5,6 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./grafana-admin.sops.yaml
-  - ./influxdb-auth.sops.yaml
   - ./grafana-ro-credentials.sops.yaml
 configMapGenerator:
   - name: grafana-dashboard-air-quality

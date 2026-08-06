@@ -31,7 +31,6 @@ spec:
         memory: 512Mi
     admin:
       existingSecret: grafana-admin
-    envFromSecret: influxdb-auth
     envFromSecrets:
       - name: grafana-ro-credentials
         prefix: GRAFANA_RO_
@@ -49,16 +48,6 @@ spec:
       datasources.yaml:
         apiVersion: 1
         datasources:
-          - name: InfluxDB
-            type: influxdb
-            access: proxy
-            url: http://influxdb.observability.svc.cluster.local:8086
-            database: homeassistant
-            jsonData:
-              version: InfluxQL
-              httpHeaderName1: Authorization
-            secureJsonData:
-              httpHeaderValue1: Bearer $INFLUXDB3_TOKEN
           - name: Postgres-Telegraf
             uid: postgres-telegraf
             type: postgres

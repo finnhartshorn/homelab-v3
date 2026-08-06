@@ -24,9 +24,6 @@ spec:
             image:
               repository: docker.io/library/telegraf
               tag: "1.39"
-            envFrom:
-              - secretRef:
-                  name: influxdb-auth
             env:
               TELEGRAF_DB_PASSWORD:
                 valueFrom:
