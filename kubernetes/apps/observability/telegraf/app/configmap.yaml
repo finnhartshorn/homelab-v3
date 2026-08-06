@@ -14,6 +14,46 @@ data:
     [[inputs.prometheus]]
       urls = ["http://longhorn-backend.longhorn-system.svc.cluster.local:9500/metrics"]
 
+    [[inputs.prometheus]]
+      urls = ["http://external-ingress-nginx-controller-metrics.network.svc.cluster.local:10254/metrics"]
+
+    [[inputs.prometheus]]
+      urls = ["http://internal-ingress-nginx-controller-metrics.network.svc.cluster.local:10254/metrics"]
+
+    # CoreDNS, Cilium and CNPG have no stable Service exposing their metrics
+    # port (CoreDNS: kube-dns Service only covers 53; Cilium: cilium-agent
+    # Service only covers the Envoy port, not the agent's own metrics; CNPG's
+    # -rw/-ro/-r Services only cover 5432) - discover by pod label instead,
+    # which also means every replica gets scraped rather than whichever pod a
+    # Service happens to route a given request to.
+    [[inputs.prometheus]]
+      monitor_kubernetes_pods = true
+      monitor_kubernetes_pods_method = "settings"
+      monitor_kubernetes_pods_namespace = "kube-system"
+      monitor_kubernetes_pods_port = "9153"
+      kubernetes_label_selector = "k8s-app=kube-dns"
+
+    [[inputs.prometheus]]
+      monitor_kubernetes_pods = true
+      monitor_kubernetes_pods_method = "settings"
+      monitor_kubernetes_pods_namespace = "kube-system"
+      monitor_kubernetes_pods_port = "9962"
+      kubernetes_label_selector = "k8s-app=cilium"
+
+    [[inputs.prometheus]]
+      monitor_kubernetes_pods = true
+      monitor_kubernetes_pods_method = "settings"
+      monitor_kubernetes_pods_namespace = "kube-system"
+      monitor_kubernetes_pods_port = "9963"
+      kubernetes_label_selector = "io.cilium/app=operator"
+
+    [[inputs.prometheus]]
+      monitor_kubernetes_pods = true
+      monitor_kubernetes_pods_method = "settings"
+      monitor_kubernetes_pods_namespace = "database"
+      monitor_kubernetes_pods_port = "9187"
+      kubernetes_label_selector = "cnpg.io/cluster=postgres"
+
     [[inputs.kube_inventory]]
       url = "https://kubernetes.default.svc"
       bearer_token = "/var/run/secrets/kubernetes.io/serviceaccount/token"

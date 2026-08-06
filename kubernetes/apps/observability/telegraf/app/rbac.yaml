@@ -4,10 +4,12 @@ kind: ServiceAccount
 metadata:
   name: telegraf
 ---
-# Read-only access for inputs.kube_inventory (cluster object state) and
+# Read-only access for inputs.kube_inventory (cluster object state),
 # nodes/stats for inputs.kubernetes (per-node kubelet summary API, scraped
 # directly against each node's kubelet rather than proxied through the
-# apiserver).
+# apiserver), and pod watch for inputs.prometheus' monitor_kubernetes_pods
+# (CoreDNS/Cilium/CNPG scrapes, which have no stable Service to target so
+# are discovered by pod label instead).
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -17,12 +19,15 @@ rules:
     resources:
       - namespaces
       - nodes
-      - pods
       - persistentvolumes
       - persistentvolumeclaims
       - resourcequotas
       - services
     verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources:
+      - pods
+    verbs: ["get", "list", "watch"]
   - apiGroups: [""]
     resources:
       - nodes/stats
