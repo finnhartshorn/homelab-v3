@@ -30,28 +30,28 @@ data:
       monitor_kubernetes_pods = true
       monitor_kubernetes_pods_method = "settings"
       monitor_kubernetes_pods_namespace = "kube-system"
-      monitor_kubernetes_pods_port = "9153"
+      monitor_kubernetes_pods_port = 9153
       kubernetes_label_selector = "k8s-app=kube-dns"
 
     [[inputs.prometheus]]
       monitor_kubernetes_pods = true
       monitor_kubernetes_pods_method = "settings"
       monitor_kubernetes_pods_namespace = "kube-system"
-      monitor_kubernetes_pods_port = "9962"
+      monitor_kubernetes_pods_port = 9962
       kubernetes_label_selector = "k8s-app=cilium"
 
     [[inputs.prometheus]]
       monitor_kubernetes_pods = true
       monitor_kubernetes_pods_method = "settings"
       monitor_kubernetes_pods_namespace = "kube-system"
-      monitor_kubernetes_pods_port = "9963"
+      monitor_kubernetes_pods_port = 9963
       kubernetes_label_selector = "io.cilium/app=operator"
 
     [[inputs.prometheus]]
       monitor_kubernetes_pods = true
       monitor_kubernetes_pods_method = "settings"
       monitor_kubernetes_pods_namespace = "database"
-      monitor_kubernetes_pods_port = "9187"
+      monitor_kubernetes_pods_port = 9187
       kubernetes_label_selector = "cnpg.io/cluster=postgres"
 
     [[inputs.kube_inventory]]
