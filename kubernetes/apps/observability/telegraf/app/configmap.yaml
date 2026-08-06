@@ -11,9 +11,6 @@ data:
       flush_interval = "30s"
       omit_hostname = true
 
-    [[inputs.prometheus]]
-      urls = ["http://longhorn-backend.longhorn-system.svc.cluster.local:9500/metrics"]
-
     # namedrop excludes two metrics whose names exceed Postgres's 63-byte
     # identifier limit, which breaks table create/lookup permanently.
     [[inputs.prometheus]]
@@ -24,12 +21,16 @@ data:
       urls = ["http://internal-ingress-nginx-controller-metrics.network.svc.cluster.local:10254/metrics"]
       namedrop = ["nginx_ingress_controller_nginx_process_oldest_start_time_seconds", "nginx_ingress_controller_config_last_reload_successful_timestamp_seconds"]
 
-    # CoreDNS, Cilium and CNPG have no stable Service exposing their metrics
-    # port (CoreDNS: kube-dns Service only covers 53; Cilium: cilium-agent
-    # Service only covers the Envoy port, not the agent's own metrics; CNPG's
-    # -rw/-ro/-r Services only cover 5432) - discover by pod label instead,
-    # which also means every replica gets scraped rather than whichever pod a
-    # Service happens to route a given request to.
+    # CoreDNS, Cilium, CNPG and Longhorn have no stable Service exposing
+    # per-replica metrics (CoreDNS: kube-dns Service only covers 53; Cilium:
+    # cilium-agent Service only covers the Envoy port, not the agent's own
+    # metrics; CNPG's -rw/-ro/-r Services only cover 5432; Longhorn's
+    # longhorn-backend Service load-balances across all longhorn-manager
+    # pods, so scraping it only ever captures whichever one node kube-proxy
+    # routed the request to at that instant instead of all of them) -
+    # discover by pod label instead, which also means every replica gets
+    # scraped rather than whichever pod a Service happens to route a given
+    # request to.
     [[inputs.prometheus]]
       monitor_kubernetes_pods = true
       monitor_kubernetes_pods_method = "settings"
@@ -63,6 +64,13 @@ data:
       monitor_kubernetes_pods_namespace = "database"
       monitor_kubernetes_pods_port = 9187
       kubernetes_label_selector = "cnpg.io/cluster=postgres"
+
+    [[inputs.prometheus]]
+      monitor_kubernetes_pods = true
+      monitor_kubernetes_pods_method = "settings"
+      monitor_kubernetes_pods_namespace = "longhorn-system"
+      monitor_kubernetes_pods_port = 9500
+      kubernetes_label_selector = "app=longhorn-manager"
 
     [[inputs.kube_inventory]]
       url = "https://kubernetes.default.svc"
