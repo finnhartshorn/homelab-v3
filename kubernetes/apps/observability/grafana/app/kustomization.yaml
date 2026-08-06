@@ -21,3 +21,10 @@ configMapGenerator:
       disableNameSuffixHash: true
       labels:
         grafana_dashboard: "1"
+  - name: grafana-dashboard-longhorn
+    files:
+      - ./dashboards/longhorn.json
+    options:
+      disableNameSuffixHash: true
+      labels:
+        grafana_dashboard: "1"

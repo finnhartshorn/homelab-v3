@@ -1,0 +1,2724 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "panels": [],
+      "title": "Storage Overview",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 1
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT gauge AS \"Nodes\"\nFROM longhorn_node_count_total\nORDER BY time DESC\nLIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Nodes",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 1
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT sum(gauge) AS \"Total Storage Capacity\"\nFROM (\n  SELECT DISTINCT ON (node) node, gauge\n  FROM longhorn_node_storage_capacity_bytes\n  ORDER BY node, time DESC\n) latest",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT sum(gauge) AS \"Total Storage Usage\"\nFROM (\n  SELECT DISTINCT ON (node) node, gauge\n  FROM longhorn_node_storage_usage_bytes\n  ORDER BY node, time DESC\n) latest",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Total Storage Capacity / Usage",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 1
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS \"Volumes Degraded/Faulted\"\nFROM (\n  SELECT DISTINCT ON (volume) volume, state, gauge\n  FROM longhorn_volume_robustness\n  WHERE state IN ('degraded', 'faulted')\n  ORDER BY volume, time DESC\n) latest\nWHERE gauge = 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Volumes Degraded/Faulted",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 1
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS \"Replicas Rebuilding\"\nFROM (\n  SELECT DISTINCT ON (replica) replica, mode, gauge\n  FROM longhorn_engine_replica_mode\n  ORDER BY replica, time DESC\n) latest\nWHERE gauge = 1 AND mode != 'RW'",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Replicas Rebuilding",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 6,
+      "panels": [],
+      "title": "Node & Disk Capacity ($node)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 6
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT\n  u.time,\n  u.node AS metric,\n  (u.gauge::float8 / NULLIF(c.gauge, 0)) * 100 AS value\nFROM longhorn_node_storage_usage_bytes u\nJOIN longhorn_node_storage_capacity_bytes c\n  ON c.node = u.node AND c.time = u.time\nWHERE $__timeFilter(u.time) AND u.node IN ($node)\nORDER BY u.time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Node Storage Usage %",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Capacity"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Usage"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Reserved"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Scheduled"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 6
+      },
+      "id": 8,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH capacity AS (\n  SELECT DISTINCT ON (node) node, gauge AS capacity_bytes\n  FROM longhorn_node_storage_capacity_bytes\n  WHERE node IN ($node)\n  ORDER BY node, time DESC\n), usage AS (\n  SELECT DISTINCT ON (node) node, gauge AS usage_bytes\n  FROM longhorn_node_storage_usage_bytes\n  WHERE node IN ($node)\n  ORDER BY node, time DESC\n), reservation AS (\n  SELECT DISTINCT ON (node) node, gauge AS reservation_bytes\n  FROM longhorn_node_storage_reservation_bytes\n  WHERE node IN ($node)\n  ORDER BY node, time DESC\n), scheduled AS (\n  SELECT DISTINCT ON (node) node, gauge AS scheduled_bytes\n  FROM longhorn_node_storage_scheduled_bytes\n  WHERE node IN ($node)\n  ORDER BY node, time DESC\n)\nSELECT\n  c.node AS \"Node\",\n  c.capacity_bytes AS \"Capacity\",\n  u.usage_bytes AS \"Usage\",\n  r.reservation_bytes AS \"Reserved\",\n  s.scheduled_bytes AS \"Scheduled\"\nFROM capacity c\nLEFT JOIN usage u ON u.node = c.node\nLEFT JOIN reservation r ON r.node = c.node\nLEFT JOIN scheduled s ON s.node = c.node\nORDER BY \"Node\"",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Node Storage Breakdown",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Capacity"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Usage"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Reserved"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 14
+      },
+      "id": 9,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH capacity AS (\n  SELECT DISTINCT ON (node, disk) node, disk, gauge AS capacity_bytes\n  FROM longhorn_disk_capacity_bytes\n  WHERE node IN ($node)\n  ORDER BY node, disk, time DESC\n), usage AS (\n  SELECT DISTINCT ON (node, disk) node, disk, gauge AS usage_bytes\n  FROM longhorn_disk_usage_bytes\n  WHERE node IN ($node)\n  ORDER BY node, disk, time DESC\n), reservation AS (\n  SELECT DISTINCT ON (node, disk) node, disk, gauge AS reservation_bytes\n  FROM longhorn_disk_reservation_bytes\n  WHERE node IN ($node)\n  ORDER BY node, disk, time DESC\n)\nSELECT\n  c.node AS \"Node\",\n  c.disk AS \"Disk\",\n  c.capacity_bytes AS \"Capacity\",\n  u.usage_bytes AS \"Usage\",\n  r.reservation_bytes AS \"Reserved\"\nFROM capacity c\nLEFT JOIN usage u ON u.node = c.node AND u.disk = c.disk\nLEFT JOIN reservation r ON r.node = c.node AND r.disk = c.disk\nORDER BY \"Node\", \"Disk\"",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Disk Capacity vs Usage vs Reservation",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 22
+      },
+      "id": 10,
+      "panels": [],
+      "title": "Node & Disk Health ($node)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "fillOpacity": 70,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "True": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "True"
+                },
+                "False": {
+                  "color": "red",
+                  "index": 1,
+                  "text": "False"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "id": 11,
+      "options": {
+        "alignValue": "center",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, node || ' \u2014 ' || condition AS metric, 'True' AS value\nFROM longhorn_node_status\nWHERE gauge = 1 AND $__timeFilter(time) AND node IN ($node)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Node Conditions",
+      "type": "state-timeline"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "fillOpacity": 70,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "True": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "True"
+                },
+                "False": {
+                  "color": "red",
+                  "index": 1,
+                  "text": "False"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 31
+      },
+      "id": 12,
+      "options": {
+        "alignValue": "center",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, node || ' / ' || disk || ' \u2014 ' || condition AS metric, 'True' AS value\nFROM longhorn_disk_status\nWHERE gauge = 1 AND $__timeFilter(time) AND node IN ($node)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Disk Conditions",
+      "type": "state-timeline"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Healthy"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 1
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 39
+      },
+      "id": 13,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT\n  node AS \"Node\",\n  disk AS \"Disk\",\n  gauge AS \"Healthy\"\nFROM (\n  SELECT DISTINCT ON (node, disk) node, disk, gauge\n  FROM longhorn_disk_health\n  WHERE node IN ($node)\n  ORDER BY node, disk, time DESC\n) latest\nORDER BY \"Node\", \"Disk\"",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Disk Health",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 39
+      },
+      "id": 14,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT\n  node AS \"Node\",\n  disk AS \"Disk\",\n  attribute AS \"Attribute\",\n  attribute_id AS \"Attribute ID\",\n  gauge AS \"Raw Value\"\nFROM (\n  SELECT DISTINCT ON (node, disk, attribute) node, disk, attribute, attribute_id, gauge\n  FROM longhorn_disk_health_attribute_raw\n  WHERE node IN ($node)\n  ORDER BY node, disk, attribute, time DESC\n) latest\nORDER BY \"Node\", \"Disk\", \"Attribute\"",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Disk SMART Attributes (raw)",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 47
+      },
+      "id": 15,
+      "panels": [],
+      "title": "Node Resources ($node)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Memory Capacity"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Memory Usage"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 48
+      },
+      "id": 16,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH cpu_capacity AS (\n  SELECT DISTINCT ON (node) node, gauge AS cpu_capacity\n  FROM longhorn_node_cpu_capacity_millicpu\n  WHERE node IN ($node)\n  ORDER BY node, time DESC\n), cpu_usage AS (\n  SELECT DISTINCT ON (node) node, gauge AS cpu_usage\n  FROM longhorn_node_cpu_usage_millicpu\n  WHERE node IN ($node)\n  ORDER BY node, time DESC\n), mem_capacity AS (\n  SELECT DISTINCT ON (node) node, gauge AS mem_capacity\n  FROM longhorn_node_memory_capacity_bytes\n  WHERE node IN ($node)\n  ORDER BY node, time DESC\n), mem_usage AS (\n  SELECT DISTINCT ON (node) node, gauge AS mem_usage\n  FROM longhorn_node_memory_usage_bytes\n  WHERE node IN ($node)\n  ORDER BY node, time DESC\n)\nSELECT\n  cc.node AS \"Node\",\n  cc.cpu_capacity / 1000.0 AS \"CPU Capacity (cores)\",\n  cu.cpu_usage / 1000.0 AS \"CPU Usage (cores)\",\n  mc.mem_capacity AS \"Memory Capacity\",\n  mu.mem_usage AS \"Memory Usage\"\nFROM cpu_capacity cc\nLEFT JOIN cpu_usage cu ON cu.node = cc.node\nLEFT JOIN mem_capacity mc ON mc.node = cc.node\nLEFT JOIN mem_usage mu ON mu.node = cc.node\nORDER BY \"Node\"",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Node CPU & Memory",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 56
+      },
+      "id": 17,
+      "panels": [],
+      "title": "Manager Resources ($node)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 57
+      },
+      "id": 18,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, node || ' / ' || manager AS metric, gauge AS value\nFROM longhorn_manager_cpu_usage_millicpu\nWHERE $__timeFilter(time) AND node IN ($node)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, node || ' / ' || manager AS metric, gauge AS value\nFROM longhorn_manager_memory_usage_bytes\nWHERE $__timeFilter(time) AND node IN ($node)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Manager Process CPU/Memory",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "C"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "D"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 65
+      },
+      "id": 19,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, node || ' / ' || instance_manager AS metric, gauge AS value\nFROM longhorn_instance_manager_cpu_usage_millicpu\nWHERE $__timeFilter(time) AND node IN ($node)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, node || ' / ' || instance_manager AS metric, gauge AS value\nFROM longhorn_instance_manager_cpu_requests_millicpu\nWHERE $__timeFilter(time) AND node IN ($node)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, node || ' / ' || instance_manager AS metric, gauge AS value\nFROM longhorn_instance_manager_memory_usage_bytes\nWHERE $__timeFilter(time) AND node IN ($node)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, node || ' / ' || instance_manager AS metric, gauge AS value\nFROM longhorn_instance_manager_memory_requests_bytes\nWHERE $__timeFilter(time) AND node IN ($node)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "D",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Instance Manager CPU/Memory: Usage vs Requests",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 73
+      },
+      "id": 20,
+      "panels": [],
+      "title": "Volume Performance ($volume)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "iops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 74
+      },
+      "id": 21,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, pvc || ' read' AS metric, gauge AS value\nFROM longhorn_volume_read_iops\nWHERE $__timeFilter(time) AND volume IN ($volume)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, pvc || ' write' AS metric, gauge AS value\nFROM longhorn_volume_write_iops\nWHERE $__timeFilter(time) AND volume IN ($volume)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Volume IOPS",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ns"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 74
+      },
+      "id": 22,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, pvc || ' read' AS metric, gauge AS value\nFROM longhorn_volume_read_latency\nWHERE $__timeFilter(time) AND volume IN ($volume)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, pvc || ' write' AS metric, gauge AS value\nFROM longhorn_volume_write_latency\nWHERE $__timeFilter(time) AND volume IN ($volume)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Volume Latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 74
+      },
+      "id": 23,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, pvc || ' read' AS metric, gauge AS value\nFROM longhorn_volume_read_throughput\nWHERE $__timeFilter(time) AND volume IN ($volume)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, pvc || ' write' AS metric, gauge AS value\nFROM longhorn_volume_write_throughput\nWHERE $__timeFilter(time) AND volume IN ($volume)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Volume Throughput",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 82
+      },
+      "id": 24,
+      "panels": [],
+      "title": "Volume Health ($volume)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "fillOpacity": 70,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "True": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "True"
+                },
+                "False": {
+                  "color": "red",
+                  "index": 1,
+                  "text": "False"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 83
+      },
+      "id": 25,
+      "options": {
+        "alignValue": "center",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, pvc || ' \u2014 ' || state AS metric, CASE WHEN gauge = 1 THEN 'True' ELSE 'False' END AS value\nFROM longhorn_volume_robustness\nWHERE $__timeFilter(time) AND volume IN ($volume)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Volume Robustness",
+      "type": "state-timeline"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "fillOpacity": 70,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "True": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "True"
+                },
+                "False": {
+                  "color": "red",
+                  "index": 1,
+                  "text": "False"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 91
+      },
+      "id": 26,
+      "options": {
+        "alignValue": "center",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, pvc || ' \u2014 ' || state AS metric, CASE WHEN gauge = 1 THEN 'True' ELSE 'False' END AS value\nFROM longhorn_volume_state\nWHERE $__timeFilter(time) AND volume IN ($volume)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Volume State",
+      "type": "state-timeline"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Used %"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "orange",
+                      "value": 80
+                    },
+                    {
+                      "color": "red",
+                      "value": 95
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 99
+      },
+      "id": 27,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH actual AS (\n  SELECT DISTINCT ON (volume) volume, pvc, pvc_namespace, gauge AS actual_bytes\n  FROM longhorn_volume_actual_size_bytes\n  WHERE volume IN ($volume)\n  ORDER BY volume, time DESC\n), capacity AS (\n  SELECT DISTINCT ON (volume) volume, gauge AS capacity_bytes\n  FROM longhorn_volume_capacity_bytes\n  WHERE volume IN ($volume)\n  ORDER BY volume, time DESC\n), encrypted AS (\n  SELECT DISTINCT ON (volume) volume, gauge AS encrypted\n  FROM longhorn_volume_encrypted\n  WHERE volume IN ($volume)\n  ORDER BY volume, time DESC\n), last_backup AS (\n  SELECT DISTINCT ON (volume) volume, gauge AS last_backup_epoch\n  FROM longhorn_volume_last_backup_at\n  WHERE volume IN ($volume)\n  ORDER BY volume, time DESC\n)\nSELECT\n  a.pvc AS \"PVC\",\n  a.pvc_namespace AS \"Namespace\",\n  round((a.actual_bytes::numeric / NULLIF(c.capacity_bytes, 0)::numeric) * 100, 1) AS \"Used %\",\n  CASE WHEN e.encrypted = 1 THEN 'Yes' ELSE 'No' END AS \"Encrypted\",\n  round((extract(epoch FROM (now() - to_timestamp(lb.last_backup_epoch))) / 3600.0)::numeric, 1) AS \"Last Backup Age (hrs)\"\nFROM actual a\nLEFT JOIN capacity c ON c.volume = a.volume\nLEFT JOIN encrypted e ON e.volume = a.volume\nLEFT JOIN last_backup lb ON lb.volume = a.volume\nORDER BY \"PVC\"",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Volume Details",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Actual Size"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 107
+      },
+      "id": 28,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT\n  volume AS \"Volume\",\n  snapshot AS \"Snapshot\",\n  gauge AS \"Actual Size\",\n  user_created AS \"User Created\"\nFROM (\n  SELECT DISTINCT ON (volume, snapshot) volume, snapshot, gauge, user_created\n  FROM longhorn_snapshot_actual_size_bytes\n  WHERE volume IN ($volume)\n  ORDER BY volume, snapshot, time DESC\n) latest\nORDER BY \"Actual Size\" DESC\nLIMIT 50",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Snapshot Storage",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 115
+      },
+      "id": 29,
+      "panels": [],
+      "title": "Replica & Engine ($volume)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "fillOpacity": 70,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "True": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "True"
+                },
+                "False": {
+                  "color": "red",
+                  "index": 1,
+                  "text": "False"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 116
+      },
+      "id": 30,
+      "options": {
+        "alignValue": "center",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, replica || ' \u2014 ' || state AS metric, CASE WHEN gauge = 1 THEN 'True' ELSE 'False' END AS value\nFROM longhorn_replica_state\nWHERE $__timeFilter(time) AND volume IN ($volume)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Replica State",
+      "type": "state-timeline"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "fillOpacity": 70,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "True": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "True"
+                },
+                "False": {
+                  "color": "red",
+                  "index": 1,
+                  "text": "False"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 124
+      },
+      "id": 31,
+      "options": {
+        "alignValue": "center",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, engine || ' \u2014 ' || state AS metric, CASE WHEN gauge = 1 THEN 'True' ELSE 'False' END AS value\nFROM longhorn_engine_state\nWHERE $__timeFilter(time) AND volume IN ($volume)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Engine State",
+      "type": "state-timeline"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 132
+      },
+      "id": 32,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH replicas AS (\n  SELECT DISTINCT ON (replica) replica, volume, node, disk_path, data_engine\n  FROM longhorn_replica_info\n  WHERE volume IN ($volume)\n  ORDER BY replica, time DESC\n), engines AS (\n  SELECT DISTINCT ON (engine) engine, image, frontend\n  FROM longhorn_engine_info\n  WHERE volume IN ($volume)\n  ORDER BY engine, time DESC\n), modes AS (\n  SELECT DISTINCT ON (replica) replica, engine, mode\n  FROM longhorn_engine_replica_mode\n  WHERE volume IN ($volume)\n  ORDER BY replica, time DESC\n)\nSELECT\n  r.volume AS \"Volume\",\n  r.replica AS \"Replica\",\n  r.node AS \"Node\",\n  r.disk_path AS \"Disk Path\",\n  r.data_engine AS \"Data Engine\",\n  m.mode AS \"Mode\",\n  e.image AS \"Engine Image\",\n  e.frontend AS \"Frontend\"\nFROM replicas r\nLEFT JOIN modes m ON m.replica = r.replica\nLEFT JOIN engines e ON e.engine = m.engine\nORDER BY \"Volume\", \"Replica\"",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Replica/Engine Detail",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 140
+      },
+      "id": 33,
+      "panels": [],
+      "title": "Backups ($volume)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "State"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "Error": {
+                        "color": "red",
+                        "index": 0
+                      },
+                      "Completed": {
+                        "color": "green",
+                        "index": 1
+                      },
+                      "InProgress": {
+                        "color": "blue",
+                        "index": 2
+                      },
+                      "Pending": {
+                        "color": "orange",
+                        "index": 3
+                      },
+                      "New": {
+                        "color": "text",
+                        "index": 4
+                      },
+                      "Unknown": {
+                        "color": "orange",
+                        "index": 5
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 141
+      },
+      "id": 34,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "-- gauge enum decoded per longhorn.io/docs/1.11.1/monitoring/metrics/\n-- (0=New, 1=Pending, 2=InProgress, 3=Completed, 4=Error, 5=Unknown)\nSELECT\n  volume AS \"Volume\",\n  backup AS \"Backup\",\n  recurring_job AS \"Recurring Job\",\n  CASE gauge\n    WHEN 0 THEN 'New'\n    WHEN 1 THEN 'Pending'\n    WHEN 2 THEN 'InProgress'\n    WHEN 3 THEN 'Completed'\n    WHEN 4 THEN 'Error'\n    WHEN 5 THEN 'Unknown'\n    ELSE 'Unknown'\n  END AS \"State\"\nFROM (\n  SELECT DISTINCT ON (backup) backup, volume, recurring_job, gauge\n  FROM longhorn_backup_state\n  WHERE volume IN ($volume)\n  ORDER BY backup, time DESC\n) latest\nORDER BY \"Volume\", \"Backup\"",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Backup State",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Actual Size"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Uploaded Size"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 149
+      },
+      "id": 35,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH actual AS (\n  SELECT DISTINCT ON (backup) backup, volume, gauge AS actual_bytes\n  FROM longhorn_backup_actual_size_bytes\n  WHERE volume IN ($volume)\n  ORDER BY backup, time DESC\n), uploaded AS (\n  SELECT DISTINCT ON (backup) backup, gauge AS uploaded_bytes\n  FROM longhorn_backup_uploaded_data_size_bytes\n  WHERE volume IN ($volume)\n  ORDER BY backup, time DESC\n)\nSELECT\n  a.volume AS \"Volume\",\n  a.backup AS \"Backup\",\n  a.actual_bytes AS \"Actual Size\",\n  u.uploaded_bytes AS \"Uploaded Size\"\nFROM actual a\nLEFT JOIN uploaded u ON u.backup = a.backup\nORDER BY \"Volume\", \"Backup\"",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Backup Size: Actual vs Uploaded",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 157
+      },
+      "id": 36,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT sum(gauge) AS \"Backup Volume Backups\"\nFROM (\n  SELECT DISTINCT ON (backup_volume) backup_volume, gauge\n  FROM longhorn_backup_volume_backups_count\n  ORDER BY backup_volume, time DESC\n) latest",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT gauge AS \"Backup Target Volumes\"\nFROM longhorn_backup_target_backup_volume_count\nORDER BY time DESC\nLIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Backup Counts",
+      "type": "stat"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 42,
+  "tags": [
+    "longhorn",
+    "storage"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "datasource": {
+          "type": "postgres",
+          "uid": "postgres-telegraf"
+        },
+        "definition": "SELECT DISTINCT node AS __text, node AS __value FROM longhorn_node_status WHERE node IS NOT NULL ORDER BY 1",
+        "includeAll": true,
+        "label": "Node",
+        "multi": true,
+        "name": "node",
+        "options": [],
+        "query": "SELECT DISTINCT node AS __text, node AS __value FROM longhorn_node_status WHERE node IS NOT NULL ORDER BY 1",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "postgres",
+          "uid": "postgres-telegraf"
+        },
+        "definition": "SELECT DISTINCT pvc AS __text, volume AS __value FROM longhorn_volume_read_iops WHERE volume IS NOT NULL ORDER BY 1",
+        "includeAll": true,
+        "label": "Volume",
+        "multi": true,
+        "name": "volume",
+        "options": [],
+        "query": "SELECT DISTINCT pvc AS __text, volume AS __value FROM longhorn_volume_read_iops WHERE volume IS NOT NULL ORDER BY 1",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Longhorn",
+  "uid": "longhorn",
+  "version": 1,
+  "weekStart": ""
+}
