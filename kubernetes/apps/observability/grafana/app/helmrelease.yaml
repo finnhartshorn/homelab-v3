@@ -47,6 +47,9 @@ spec:
     datasources:
       datasources.yaml:
         apiVersion: 1
+        deleteDatasources:
+          - name: InfluxDB
+            orgId: 1
         datasources:
           - name: Postgres-Telegraf
             uid: postgres-telegraf
