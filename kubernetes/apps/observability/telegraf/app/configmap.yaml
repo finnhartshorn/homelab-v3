@@ -101,6 +101,51 @@ data:
       bearer_token = "/var/run/secrets/kubernetes.io/serviceaccount/token"
       insecure_skip_verify = true
 
+    # CPU-throttling counters (nr_periods/nr_throttled/throttled_usec from
+    # cgroup cpu.stat, the same numbers used manually via `kubectl exec ...
+    # cat /sys/fs/cgroup/cpu.stat` to diagnose telegraf's own throttling on
+    # 2026-08-06) aren't in the kubelet summary API above, only cAdvisor's
+    # /metrics/cadvisor endpoint - a full dump of every cgroup metric for
+    # every container on the node (~2.5MB/scrape). namepass keeps just the
+    # 3 counters we want instead of the ~1000 other series in there, but
+    # namepass filters after parsing, so the full payload still gets
+    # downloaded and parsed every time - a 120s interval (vs. the 30s
+    # default) keeps that repeated parse from becoming a throttling source
+    # itself. tagexclude drops "id"/"name", which are just the same
+    # container ID as an extra tag with no analytical value here.
+    # node1
+    [[inputs.prometheus]]
+      interval = "120s"
+      urls = ["https://192.168.1.202:10250/metrics/cadvisor"]
+      bearer_token = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+      insecure_skip_verify = true
+      namepass = ["container_cpu_cfs_periods_total", "container_cpu_cfs_throttled_periods_total", "container_cpu_cfs_throttled_seconds_total"]
+      tagexclude = ["id", "name"]
+      [inputs.prometheus.tags]
+        node = "node1"
+
+    # node2
+    [[inputs.prometheus]]
+      interval = "120s"
+      urls = ["https://192.168.1.204:10250/metrics/cadvisor"]
+      bearer_token = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+      insecure_skip_verify = true
+      namepass = ["container_cpu_cfs_periods_total", "container_cpu_cfs_throttled_periods_total", "container_cpu_cfs_throttled_seconds_total"]
+      tagexclude = ["id", "name"]
+      [inputs.prometheus.tags]
+        node = "node2"
+
+    # node3
+    [[inputs.prometheus]]
+      interval = "120s"
+      urls = ["https://192.168.1.201:10250/metrics/cadvisor"]
+      bearer_token = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+      insecure_skip_verify = true
+      namepass = ["container_cpu_cfs_periods_total", "container_cpu_cfs_throttled_periods_total", "container_cpu_cfs_throttled_seconds_total"]
+      tagexclude = ["id", "name"]
+      [inputs.prometheus.tags]
+        node = "node3"
+
     [[inputs.influxdb_v2_listener]]
       service_address = ":8186"
       token = "$${TELEGRAF_LISTENER_TOKEN}"
