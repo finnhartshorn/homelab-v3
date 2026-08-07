@@ -15,49 +15,65 @@ data:
       r record;
       seg_cols text;
     BEGIN
-      -- 1. Convert any plain tables Telegraf created into hypertables
       FOR r IN
-        SELECT tablename FROM pg_tables
-        WHERE schemaname = 'public'
-          AND tablename NOT IN (SELECT hypertable_name FROM timescaledb_information.hypertables)
+        SELECT tablename FROM pg_tables WHERE schemaname = 'public'
       LOOP
-        EXECUTE format('SELECT create_hypertable(%L::regclass, %L, migrate_data => true);', quote_ident(r.tablename), 'time');
-      END LOOP;
-
-      -- 2. Ensure every hypertable has a 90-day retention policy
-      FOR r IN
-        SELECT h.hypertable_name FROM timescaledb_information.hypertables h
-        WHERE NOT EXISTS (
-          SELECT 1 FROM timescaledb_information.jobs j
-          WHERE j.proc_name = 'policy_retention' AND j.hypertable_name = h.hypertable_name
-        )
-      LOOP
-        EXECUTE format('SELECT add_retention_policy(%L::regclass, INTERVAL ''90 days'', if_not_exists => true);', quote_ident(r.hypertable_name));
-      END LOOP;
-
-      -- 3. Ensure every hypertable has compression enabled + a policy, segmented by its own tag columns
-      FOR r IN
-        SELECT h.hypertable_name FROM timescaledb_information.hypertables h
-        WHERE NOT EXISTS (
-          SELECT 1 FROM timescaledb_information.jobs j
-          WHERE j.proc_name = 'policy_compression' AND j.hypertable_name = h.hypertable_name
-        )
-      LOOP
-        IF NOT (SELECT compression_enabled FROM timescaledb_information.hypertables WHERE hypertable_name = r.hypertable_name) THEN
-          SELECT string_agg(quote_ident(column_name), ',' ORDER BY ordinal_position)
-          INTO seg_cols
-          FROM information_schema.columns
-          WHERE table_schema = 'public' AND table_name = r.hypertable_name
-            AND column_name <> 'time'
-            AND data_type NOT IN ('double precision','real','integer','bigint','smallint','numeric','boolean');
-
-          IF seg_cols IS NOT NULL THEN
-            EXECUTE format('ALTER TABLE %I SET (timescaledb.compress, timescaledb.compress_segmentby = %L, timescaledb.compress_orderby = ''time DESC'');', r.hypertable_name, seg_cols);
-          ELSE
-            EXECUTE format('ALTER TABLE %I SET (timescaledb.compress, timescaledb.compress_orderby = ''time DESC'');', r.hypertable_name);
+        -- 1. Convert to a hypertable if needed, and ensure a 90-day retention policy.
+        -- Isolated in its own sub-transaction so a failure here (or in compression,
+        -- below) can't roll back progress already made on other tables this run.
+        BEGIN
+          IF NOT EXISTS (
+            SELECT 1 FROM timescaledb_information.hypertables WHERE hypertable_name = r.tablename
+          ) THEN
+            EXECUTE format('SELECT create_hypertable(%L::regclass, %L, migrate_data => true);', quote_ident(r.tablename), 'time');
           END IF;
-        END IF;
 
-        EXECUTE format('SELECT add_compression_policy(%L::regclass, INTERVAL ''7 days'', if_not_exists => true);', quote_ident(r.hypertable_name));
+          IF NOT EXISTS (
+            SELECT 1 FROM timescaledb_information.jobs j
+            WHERE j.proc_name = 'policy_retention' AND j.hypertable_name = r.tablename
+          ) THEN
+            EXECUTE format('SELECT add_retention_policy(%L::regclass, INTERVAL ''90 days'', if_not_exists => true);', quote_ident(r.tablename));
+          END IF;
+        EXCEPTION WHEN OTHERS THEN
+          RAISE WARNING 'hypertable-maintenance: create/retention failed for %: %', r.tablename, SQLERRM;
+          CONTINUE;
+        END;
+
+        -- 2. Ensure compression is enabled + a policy exists, segmented by its own tag
+        -- columns. TimescaleDB errors ("too many segmentby and orderby columns") once
+        -- segmentby + orderby columns combined exceed 31 (empirically verified against
+        -- TimescaleDB 2.x); orderby is always 'time' (1 column), so high-cardinality
+        -- tables get their segmentby columns truncated to the first 30 rather than
+        -- failing outright.
+        BEGIN
+          IF NOT EXISTS (
+            SELECT 1 FROM timescaledb_information.jobs j
+            WHERE j.proc_name = 'policy_compression' AND j.hypertable_name = r.tablename
+          ) THEN
+            IF NOT (SELECT compression_enabled FROM timescaledb_information.hypertables WHERE hypertable_name = r.tablename) THEN
+              SELECT string_agg(quote_ident(column_name), ',' ORDER BY ordinal_position)
+              INTO seg_cols
+              FROM (
+                SELECT column_name, ordinal_position
+                FROM information_schema.columns
+                WHERE table_schema = 'public' AND table_name = r.tablename
+                  AND column_name <> 'time'
+                  AND data_type NOT IN ('double precision','real','integer','bigint','smallint','numeric','boolean')
+                ORDER BY ordinal_position
+                LIMIT 30
+              ) cols;
+
+              IF seg_cols IS NOT NULL THEN
+                EXECUTE format('ALTER TABLE %I SET (timescaledb.compress, timescaledb.compress_segmentby = %L, timescaledb.compress_orderby = ''time DESC'');', r.tablename, seg_cols);
+              ELSE
+                EXECUTE format('ALTER TABLE %I SET (timescaledb.compress, timescaledb.compress_orderby = ''time DESC'');', r.tablename);
+              END IF;
+            END IF;
+
+            EXECUTE format('SELECT add_compression_policy(%L::regclass, INTERVAL ''7 days'', if_not_exists => true);', quote_ident(r.tablename));
+          END IF;
+        EXCEPTION WHEN OTHERS THEN
+          RAISE WARNING 'hypertable-maintenance: compression failed for %: %', r.tablename, SQLERRM;
+        END;
       END LOOP;
     END $body$;

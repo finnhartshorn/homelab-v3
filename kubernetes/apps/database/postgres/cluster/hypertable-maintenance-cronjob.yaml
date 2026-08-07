@@ -4,7 +4,6 @@ metadata:
   name: hypertable-maintenance
 spec:
   schedule: "0 * * * *"
-  suspend: true # broken: compress_segmentby exceeds 32-column limit on high-cardinality telegraf tables, retries every run and hammers disk I/O
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
