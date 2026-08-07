@@ -2665,6 +2665,549 @@
       ],
       "title": "Backup Counts",
       "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 161
+      },
+      "id": 37,
+      "panels": [],
+      "title": "Failure & Rebuild Patterns ($node, $volume)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 162
+      },
+      "id": 38,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time_bucket('5 minutes', time) AS time, node AS metric, count(DISTINCT replica) AS value\nFROM longhorn_replica_state\nWHERE state = 'error' AND gauge = 1 AND $__timeFilter(time) AND node IN ($node)\nGROUP BY 1, 2\nORDER BY 1",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Replica Errors by Node",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 162
+      },
+      "id": 39,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH volume_pvc AS (\n  SELECT DISTINCT ON (volume) volume, pvc\n  FROM longhorn_volume_robustness\n  ORDER BY volume, time DESC\n)\nSELECT time_bucket('5 minutes', s.time) AS time, COALESCE(vp.pvc, s.volume) AS metric, count(DISTINCT s.replica) AS value\nFROM longhorn_replica_state s\nLEFT JOIN volume_pvc vp ON vp.volume = s.volume\nWHERE s.state = 'error' AND s.gauge = 1 AND $__timeFilter(s.time) AND s.volume IN ($volume)\nGROUP BY 1, 2\nORDER BY 1",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Replica Errors by PVC",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 170
+      },
+      "id": 40,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH replica_nodes AS (\n  SELECT DISTINCT ON (replica) replica, node\n  FROM longhorn_replica_info\n  ORDER BY replica, time DESC\n)\nSELECT time_bucket('5 minutes', m.time) AS time, rn.node AS metric, count(DISTINCT m.replica) AS value\nFROM longhorn_engine_replica_mode m\nJOIN replica_nodes rn ON rn.replica = m.replica\nWHERE m.mode = 'WO' AND m.gauge = 1 AND $__timeFilter(m.time) AND rn.node IN ($node)\nGROUP BY 1, 2\nORDER BY 1",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Replica Rebuilds by Node",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 170
+      },
+      "id": 41,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH volume_pvc AS (\n  SELECT DISTINCT ON (volume) volume, pvc\n  FROM longhorn_volume_robustness\n  ORDER BY volume, time DESC\n)\nSELECT time_bucket('5 minutes', m.time) AS time, COALESCE(vp.pvc, m.volume) AS metric, count(DISTINCT m.replica) AS value\nFROM longhorn_engine_replica_mode m\nLEFT JOIN volume_pvc vp ON vp.volume = m.volume\nWHERE m.mode = 'WO' AND m.gauge = 1 AND $__timeFilter(m.time) AND m.volume IN ($volume)\nGROUP BY 1, 2\nORDER BY 1",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Replica Rebuilds by PVC",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 178
+      },
+      "id": 42,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH errors AS (\n  SELECT node, count(*) AS error_samples, count(DISTINCT replica) AS replicas_errored\n  FROM longhorn_replica_state\n  WHERE state = 'error' AND gauge = 1 AND $__timeFilter(time) AND node IN ($node)\n  GROUP BY node\n), rebuilds AS (\n  SELECT rn.node, count(*) AS rebuild_samples, count(DISTINCT m.replica) AS replicas_rebuilt\n  FROM longhorn_engine_replica_mode m\n  JOIN (\n    SELECT DISTINCT ON (replica) replica, node\n    FROM longhorn_replica_info\n    ORDER BY replica, time DESC\n  ) rn ON rn.replica = m.replica\n  WHERE m.mode = 'WO' AND m.gauge = 1 AND $__timeFilter(m.time) AND rn.node IN ($node)\n  GROUP BY rn.node\n)\nSELECT\n  COALESCE(e.node, r.node) AS \"Node\",\n  COALESCE(e.error_samples, 0) AS \"Error Samples\",\n  COALESCE(e.replicas_errored, 0) AS \"Replicas Errored\",\n  COALESCE(r.rebuild_samples, 0) AS \"Rebuild Samples\",\n  COALESCE(r.replicas_rebuilt, 0) AS \"Replicas Rebuilt\"\nFROM errors e\nFULL OUTER JOIN rebuilds r ON r.node = e.node\nORDER BY \"Error Samples\" DESC, \"Rebuild Samples\" DESC",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Failure/Rebuild Totals by Node",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 178
+      },
+      "id": 43,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH volume_pvc AS (\n  SELECT DISTINCT ON (volume) volume, pvc\n  FROM longhorn_volume_robustness\n  ORDER BY volume, time DESC\n), errors AS (\n  SELECT volume, count(*) AS error_samples, count(DISTINCT replica) AS replicas_errored\n  FROM longhorn_replica_state\n  WHERE state = 'error' AND gauge = 1 AND $__timeFilter(time) AND volume IN ($volume)\n  GROUP BY volume\n), rebuilds AS (\n  SELECT volume, count(*) AS rebuild_samples, count(DISTINCT replica) AS replicas_rebuilt\n  FROM longhorn_engine_replica_mode\n  WHERE mode = 'WO' AND gauge = 1 AND $__timeFilter(time) AND volume IN ($volume)\n  GROUP BY volume\n)\nSELECT\n  COALESCE(vp.pvc, COALESCE(e.volume, r.volume)) AS \"PVC\",\n  COALESCE(e.error_samples, 0) AS \"Error Samples\",\n  COALESCE(e.replicas_errored, 0) AS \"Replicas Errored\",\n  COALESCE(r.rebuild_samples, 0) AS \"Rebuild Samples\",\n  COALESCE(r.replicas_rebuilt, 0) AS \"Replicas Rebuilt\"\nFROM errors e\nFULL OUTER JOIN rebuilds r ON r.volume = e.volume\nLEFT JOIN volume_pvc vp ON vp.volume = COALESCE(e.volume, r.volume)\nORDER BY \"Error Samples\" DESC, \"Rebuild Samples\" DESC",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Failure/Rebuild Totals by PVC",
+      "type": "table"
     }
   ],
   "preload": false,
