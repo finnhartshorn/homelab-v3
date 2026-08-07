@@ -3,7 +3,7 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: openebs-hostpath-nvme-quota
+  name: openebs-hostpath-nvme
   annotations:
     openebs.io/cas-type: local
     cas.openebs.io/config: |
@@ -11,12 +11,7 @@ metadata:
         value: "hostpath"
       - name: BasePath
         value: "/var/mnt/postgres"
-      - name: XFSQuota
-        enabled: "true"
-        data:
-          softLimitGrace: "0%"
-          hardLimitGrace: "0%"
 provisioner: openebs.io/local
 reclaimPolicy: Delete
 volumeBindingMode: WaitForFirstConsumer
-allowVolumeExpansion: false # openebs.io/local isn't a CSI driver; growth is always delete+recreate-per-instance, quota or not
+allowVolumeExpansion: false # openebs.io/local isn't a CSI driver; growth is always delete+recreate-per-instance
