@@ -28,3 +28,42 @@ with the prefix as a *literal outside* the capture group (see the
 `kubernetesupgrade.yaml` and `talosupgrade.yaml` managers in
 `.github/renovate.json5` for the pattern), instead of relying on the
 generic depName-comment manager.
+
+## Talos: ALWAYS `--dry-run` before applying machine config
+
+**Never run `talosctl apply-config` for real on a node before first running
+the exact same command with `--dry-run` and reading the full diff.** No
+exceptions, even for changes that look purely additive (a new patch file, a
+`nodeLabels` addition, anything that seems unrelated to existing settings).
+
+This repo's `talconfig.yaml` + `patches/` do **not** fully represent the
+live machine config on every node. Settings have accumulated live over time
+(sysctls, kernel modules, kubelet extraMounts, machine features) that were
+never captured back into git. `talhelper genconfig` only knows what's in
+git — anything live-but-undeclared gets silently *removed* the moment any
+config gets applied for real, regardless of how small or targeted the
+intended change is. `git diff` against the repo's own history cannot catch
+this, because the drift isn't a git-tracked change — it's a gap between git
+and reality that only shows up by diffing against the live node.
+
+Concretely, before touching any node:
+
+```
+talosctl apply-config --dry-run --talosconfig=<path> --nodes=<ip> --file=<generated-node-file> --mode=auto
+```
+
+Read every line of the diff. Anything on a `-` line that isn't something
+you intentionally meant to remove needs to be tracked down and added to a
+patch file *before* applying for real — not fixed up after the fact. A
+`--dry-run` diff against an already-modified node won't show you this
+(it'll look clean, because the drift is already gone from that node) — the
+only reliable check is running `--dry-run` against a node that hasn't been
+touched yet, or against the specific node you're about to change, before
+you change it.
+
+This was learned the hard way: an apply without `--dry-run` first silently
+dropped `vm.nr_hugepages`, `kernel.modules` (`nvme_tcp`, `vfio_pci`), a
+`/var/lib/longhorn` kubelet extraMount, and several `machine.features`
+flags from a live control-plane node — none of which were declared in git,
+all of which only surfaced by diffing a *different*, still-untouched node
+afterward.
