@@ -1,0 +1,9 @@
+machine:
+  install:
+    # Talos defaults this to true for new installs but false for existing
+    # ones upgrading to v1.12+, specifically to avoid changing which kernel
+    # cmdline GRUB uses on a cluster that's already bootstrapped. talhelper's
+    # genconfig doesn't know this cluster is pre-existing and defaults to
+    # true - pin explicitly to preserve the legacy (current, working)
+    # cmdline behavior.
+    grubUseUKICmdline: false

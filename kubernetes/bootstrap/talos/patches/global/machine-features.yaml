@@ -1,0 +1,15 @@
+machine:
+  features:
+    # Preserve settings baked in at original cluster bootstrap by whatever
+    # talhelper/Talos version was used then - the current talhelper (3.1.15)
+    # genconfig output silently omits these, which would otherwise disable
+    # them on any node this patch set touches. Pin explicitly rather than
+    # assume dropping them is safe.
+    #
+    # stableHostname is deliberately NOT repeated here: this talhelper
+    # version already manages hostname stability via a newer document-based
+    # mechanism, and re-adding the legacy field hard-conflicts with it
+    # ("stable hostname is already set in v1alpha1 config"). Its absence
+    # here is the current version's correct behavior, not a regression.
+    rbac: true
+    apidCheckExtKeyUsage: true

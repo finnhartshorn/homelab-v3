@@ -89,6 +89,8 @@ nodes:
       secureboot: false
     talosImageURL: factory.talos.dev/installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245
     controlPlane: true
+    patches:
+      - "@./patches/node3/machine-usb-serial.yaml"
     networkInterfaces:
       - deviceSelector:
           hardwareAddr: "54:bf:64:99:24:42"
@@ -104,7 +106,10 @@ nodes:
 
 # Global patches
 patches:
+  - "@./patches/global/machine-features.yaml"
   - "@./patches/global/machine-files.yaml"
+  - "@./patches/global/machine-install.yaml"
+  - "@./patches/global/machine-kernel.yaml"
   - "@./patches/global/machine-kubelet.yaml"
   - "@./patches/global/machine-network.yaml"
   - "@./patches/global/machine-sysctls.yaml"

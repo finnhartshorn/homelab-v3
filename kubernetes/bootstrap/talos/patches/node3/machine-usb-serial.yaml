@@ -1,0 +1,16 @@
+machine:
+  # Node-specific: node3 has a USB device (idVendor 303a / idProduct 831a -
+  # an Espressif/ESP32-class device, e.g. a Zigbee/Matter dongle) physically
+  # attached. Live-but-undeclared until discovered via --dry-run against
+  # this node - not present on node1/node2. cdc_acm is the USB-serial
+  # kernel module that device needs. Only cdc_acm is listed here - talhelper
+  # appends list-typed patch fields across patches rather than replacing
+  # them, so repeating nvme_tcp/vfio_pci (already set by the global
+  # machine-kernel.yaml patch) would duplicate them.
+  udev:
+    rules:
+      - SUBSYSTEM=="tty", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="831a", MODE="0660", GROUP="dialout"
+      - SUBSYSTEM=="usb", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="831a", MODE="0660"
+  kernel:
+    modules:
+      - name: cdc_acm
