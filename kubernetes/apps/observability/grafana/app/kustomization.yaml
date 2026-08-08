@@ -28,3 +28,10 @@ configMapGenerator:
       disableNameSuffixHash: true
       labels:
         grafana_dashboard: "1"
+  - name: grafana-dashboard-cnpg-postgres
+    files:
+      - ./dashboards/cnpg-postgres.json
+    options:
+      disableNameSuffixHash: true
+      labels:
+        grafana_dashboard: "1"

@@ -1,0 +1,4047 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "panels": [],
+      "title": "Cluster Status",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 1
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT count(*) AS \"Instances Up\"\nFROM (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge\n  FROM cnpg_collector_up\n  WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n) latest\nWHERE gauge = 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Instances Up",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 1
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT pod_name AS \"Current Primary\"\nFROM cnpg_collector_up\nWHERE role = 'primary' AND pod_name IN ($instance)\nORDER BY time DESC\nLIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Current Primary",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 1
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH col_err AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge\n  FROM cnpg_collector_last_collection_error\n  WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), switchover AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge\n  FROM cnpg_collector_manual_switchover_required\n  WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), fencing AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge\n  FROM cnpg_collector_fencing_on\n  WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n)\nSELECT\n  (SELECT count(*) FROM col_err WHERE gauge = 1) +\n  (SELECT count(*) FROM switchover WHERE gauge = 1) +\n  (SELECT count(*) FROM fencing WHERE gauge = 1) AS \"Collector/Failover Alerts\"",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Collector/Failover Alerts",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 1
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT gauge AS \"Min\" FROM cnpg_collector_sync_replicas\nWHERE value = 'min' AND role = 'primary'\nORDER BY time DESC\nLIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT gauge AS \"Expected\" FROM cnpg_collector_sync_replicas\nWHERE value = 'expected' AND role = 'primary'\nORDER BY time DESC\nLIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT gauge AS \"Max\" FROM cnpg_collector_sync_replicas\nWHERE value = 'max' AND role = 'primary'\nORDER BY time DESC\nLIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Sync Replica Config",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 6,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH up AS (\n  SELECT DISTINCT ON (pod_name) pod_name, role, gauge AS up\n  FROM cnpg_collector_up WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), recovery AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS in_recovery\n  FROM cnpg_pg_replication_in_recovery WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), wal_recv AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS wal_receiver_up\n  FROM cnpg_pg_replication_is_wal_receiver_up WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), streaming AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS streaming_replicas\n  FROM cnpg_pg_replication_streaming_replicas WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), version AS (\n  SELECT DISTINCT ON (pod_name) pod_name, \"full\" AS pg_version\n  FROM cnpg_collector_postgres_version WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), start_time AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS start_epoch\n  FROM cnpg_pg_postmaster_start_time WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), err AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS last_error\n  FROM cnpg_last_error WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n)\nSELECT\n  u.pod_name AS \"Instance\",\n  u.role AS \"Role\",\n  CASE WHEN u.up = 1 THEN 'Up' ELSE 'Down' END AS \"Status\",\n  CASE WHEN r.in_recovery = 1 THEN 'Yes' ELSE 'No' END AS \"In Recovery\",\n  CASE WHEN w.wal_receiver_up = 1 THEN 'Yes' ELSE 'No' END AS \"WAL Receiver Up\",\n  s.streaming_replicas AS \"Streaming Replicas\",\n  v.pg_version AS \"PG Version\",\n  round(((extract(epoch FROM now()) - t.start_epoch) / 3600.0)::numeric, 1) AS \"Uptime (hrs)\",\n  CASE WHEN e.last_error = 1 THEN 'Error' ELSE 'OK' END AS \"Last Error\"\nFROM up u\nLEFT JOIN recovery r ON r.pod_name = u.pod_name\nLEFT JOIN wal_recv w ON w.pod_name = u.pod_name\nLEFT JOIN streaming s ON s.pod_name = u.pod_name\nLEFT JOIN version v ON v.pod_name = u.pod_name\nLEFT JOIN start_time t ON t.pod_name = u.pod_name\nLEFT JOIN err e ON e.pod_name = u.pod_name\nORDER BY \"Instance\"",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Instance Status",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 13
+      },
+      "id": 7,
+      "panels": [],
+      "title": "Replication",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 14
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, application_name || ' write' AS metric, gauge AS value\nFROM cnpg_pg_stat_replication_write_lag_seconds\nWHERE $__timeFilter(time) AND application_name IN ($instance)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, application_name || ' flush' AS metric, gauge AS value\nFROM cnpg_pg_stat_replication_flush_lag_seconds\nWHERE $__timeFilter(time) AND application_name IN ($instance)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, application_name || ' replay' AS metric, gauge AS value\nFROM cnpg_pg_stat_replication_replay_lag_seconds\nWHERE $__timeFilter(time) AND application_name IN ($instance)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Replication Lag",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 14
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, application_name || ' sent' AS metric, gauge AS value\nFROM cnpg_pg_stat_replication_sent_diff_bytes\nWHERE $__timeFilter(time) AND application_name IN ($instance)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, application_name || ' write' AS metric, gauge AS value\nFROM cnpg_pg_stat_replication_write_diff_bytes\nWHERE $__timeFilter(time) AND application_name IN ($instance)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, application_name || ' flush' AS metric, gauge AS value\nFROM cnpg_pg_stat_replication_flush_diff_bytes\nWHERE $__timeFilter(time) AND application_name IN ($instance)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, application_name || ' replay' AS metric, gauge AS value\nFROM cnpg_pg_stat_replication_replay_diff_bytes\nWHERE $__timeFilter(time) AND application_name IN ($instance)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "D",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Replication Diff Bytes",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 22
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, pod_name AS metric, gauge AS value\nFROM cnpg_pg_replication_lag\nWHERE $__timeFilter(time) AND pod_name IN ($instance)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Physical Replication Lag",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 22
+      },
+      "id": 11,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, pod_name || ' / ' || slot_name AS metric, gauge AS value\nFROM cnpg_pg_replication_slots_pg_wal_lsn_diff\nWHERE $__timeFilter(time) AND pod_name IN ($instance)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Replication Slot WAL LSN Diff",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "fillOpacity": 70,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "Active": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "Active"
+                },
+                "Inactive": {
+                  "color": "red",
+                  "index": 1,
+                  "text": "Inactive"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 30
+      },
+      "id": 12,
+      "options": {
+        "alignValue": "center",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, pod_name || ' / ' || slot_name AS metric,\n  CASE WHEN gauge = 1 THEN 'Active' ELSE 'Inactive' END AS value\nFROM cnpg_pg_replication_slots_active\nWHERE $__timeFilter(time) AND pod_name IN ($instance)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Replication Slot Active State",
+      "type": "state-timeline"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sent Diff (bytes)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 38
+      },
+      "id": 13,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH wl AS (\n  SELECT DISTINCT ON (application_name) application_name, gauge AS write_lag\n  FROM cnpg_pg_stat_replication_write_lag_seconds WHERE application_name IN ($instance)\n  ORDER BY application_name, time DESC\n), fl AS (\n  SELECT DISTINCT ON (application_name) application_name, gauge AS flush_lag\n  FROM cnpg_pg_stat_replication_flush_lag_seconds WHERE application_name IN ($instance)\n  ORDER BY application_name, time DESC\n), rl AS (\n  SELECT DISTINCT ON (application_name) application_name, gauge AS replay_lag\n  FROM cnpg_pg_stat_replication_replay_lag_seconds WHERE application_name IN ($instance)\n  ORDER BY application_name, time DESC\n), sd AS (\n  SELECT DISTINCT ON (application_name) application_name, gauge AS sent_diff\n  FROM cnpg_pg_stat_replication_sent_diff_bytes WHERE application_name IN ($instance)\n  ORDER BY application_name, time DESC\n), bs AS (\n  SELECT DISTINCT ON (application_name) application_name, counter AS backend_start\n  FROM cnpg_pg_stat_replication_backend_start WHERE application_name IN ($instance)\n  ORDER BY application_name, time DESC\n), bx AS (\n  SELECT DISTINCT ON (application_name) application_name, counter AS xmin_age\n  FROM cnpg_pg_stat_replication_backend_xmin_age WHERE application_name IN ($instance)\n  ORDER BY application_name, time DESC\n)\nSELECT\n  wl.application_name AS \"Application\",\n  wl.write_lag AS \"Write Lag (s)\",\n  fl.flush_lag AS \"Flush Lag (s)\",\n  rl.replay_lag AS \"Replay Lag (s)\",\n  sd.sent_diff AS \"Sent Diff (bytes)\",\n  to_timestamp(bs.backend_start) AS \"Backend Start\",\n  bx.xmin_age AS \"Xmin Age\"\nFROM wl\nLEFT JOIN fl ON fl.application_name = wl.application_name\nLEFT JOIN rl ON rl.application_name = wl.application_name\nLEFT JOIN sd ON sd.application_name = wl.application_name\nLEFT JOIN bs ON bs.application_name = wl.application_name\nLEFT JOIN bx ON bx.application_name = wl.application_name\nORDER BY \"Application\"",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Replication Backend Detail",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 46
+      },
+      "id": 14,
+      "panels": [],
+      "title": "WAL & Checkpointing",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 47
+      },
+      "id": 15,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name,\n    (gauge - lag(gauge) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_collector_wal_bytes\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name ORDER BY time)\n)\nSELECT time, pod_name AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "WAL Generation Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 47
+      },
+      "id": 16,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name,\n    (gauge - lag(gauge) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_collector_wal_records\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name ORDER BY time)\n)\nSELECT time, pod_name || ' records' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name,\n    (gauge - lag(gauge) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_collector_wal_fpi\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name ORDER BY time)\n)\nSELECT time, pod_name || ' fpi' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name,\n    (gauge - lag(gauge) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_collector_wal_buffers_full\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name ORDER BY time)\n)\nSELECT time, pod_name || ' buffers_full' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "WAL Records / FPI / Buffers Full Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "WAL Size"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 55
+      },
+      "id": 17,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH wal_count AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS wal_files\n  FROM cnpg_collector_pg_wal WHERE value = 'count' AND pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), wal_size AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS wal_size_bytes\n  FROM cnpg_collector_pg_wal WHERE value = 'size' AND pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), ready AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS ready_files\n  FROM cnpg_collector_pg_wal_archive_status WHERE value = 'ready' AND pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), done AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS done_files\n  FROM cnpg_collector_pg_wal_archive_status WHERE value = 'done' AND pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n)\nSELECT\n  wc.pod_name AS \"Instance\",\n  wc.wal_files AS \"WAL Files\",\n  ws.wal_size_bytes AS \"WAL Size\",\n  r.ready_files AS \"Ready to Archive\",\n  d.done_files AS \"Archived (done)\"\nFROM wal_count wc\nLEFT JOIN wal_size ws ON ws.pod_name = wc.pod_name\nLEFT JOIN ready r ON r.pod_name = wc.pod_name\nLEFT JOIN done d ON d.pod_name = wc.pod_name\nORDER BY \"Instance\"",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "WAL Files & Archive Status",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 55
+      },
+      "id": 18,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_checkpointer_checkpoints_timed\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name ORDER BY time)\n)\nSELECT time, pod_name || ' checkpoints_timed' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_checkpointer_checkpoints_req\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name ORDER BY time)\n)\nSELECT time, pod_name || ' checkpoints_req' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_checkpointer_restartpoints_timed\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name ORDER BY time)\n)\nSELECT time, pod_name || ' restartpoints_timed' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_checkpointer_restartpoints_req\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name ORDER BY time)\n)\nSELECT time, pod_name || ' restartpoints_req' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "D",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_checkpointer_restartpoints_done\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name ORDER BY time)\n)\nSELECT time, pod_name || ' restartpoints_done' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "E",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Checkpoint / Restartpoint Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 63
+      },
+      "id": 19,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_checkpointer_buffers_written\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name ORDER BY time)\n)\nSELECT time, pod_name || ' checkpointer_written' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_bgwriter_buffers_clean\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name ORDER BY time)\n)\nSELECT time, pod_name || ' bgwriter_clean' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_bgwriter_buffers_alloc\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name ORDER BY time)\n)\nSELECT time, pod_name || ' bgwriter_alloc' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Buffers Written / Clean / Alloc Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 63
+      },
+      "id": 20,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_checkpointer_sync_time\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name ORDER BY time)\n)\nSELECT time, pod_name || ' sync_time' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_checkpointer_write_time\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name ORDER BY time)\n)\nSELECT time, pod_name || ' write_time' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Checkpointer Sync / Write Time",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 71
+      },
+      "id": 21,
+      "panels": [],
+      "title": "Backups & Archiving",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "h"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 72
+      },
+      "id": 22,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT round(((extract(epoch FROM now()) - gauge) / 3600.0)::numeric, 1) AS \"First Recoverability Point Age (hrs)\"\nFROM cnpg_collector_first_recoverability_point\nWHERE role = 'primary' AND gauge > 0\nORDER BY time DESC\nLIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT round(((extract(epoch FROM now()) - gauge) / 3600.0)::numeric, 1) AS \"Last Available Backup Age (hrs)\"\nFROM cnpg_collector_last_available_backup_timestamp\nWHERE role = 'primary' AND gauge > 0\nORDER BY time DESC\nLIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT round(((extract(epoch FROM now()) - gauge) / 3600.0)::numeric, 1) AS \"Last Failed Backup Age (hrs)\"\nFROM cnpg_collector_last_failed_backup_timestamp\nWHERE role = 'primary' AND gauge > 0\nORDER BY time DESC\nLIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Backup Freshness",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 76
+      },
+      "id": 23,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_archiver_archived_count\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name ORDER BY time)\n)\nSELECT time, pod_name || ' archived' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_archiver_failed_count\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name ORDER BY time)\n)\nSELECT time, pod_name || ' failed' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "WAL Archiving Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 76
+      },
+      "id": 24,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, pod_name || ' since_archival' AS metric, gauge AS value\nFROM cnpg_pg_stat_archiver_seconds_since_last_archival\nWHERE $__timeFilter(time) AND pod_name IN ($instance)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, pod_name || ' since_failure' AS metric, gauge AS value\nFROM cnpg_pg_stat_archiver_seconds_since_last_failure\nWHERE $__timeFilter(time) AND pod_name IN ($instance)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Seconds Since Last Archival / Failure",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 84
+      },
+      "id": 25,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH archived AS (\n  SELECT DISTINCT ON (pod_name) pod_name, role, counter AS archived_total\n  FROM cnpg_pg_stat_archiver_archived_count WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), failed AS (\n  SELECT DISTINCT ON (pod_name) pod_name, counter AS failed_total\n  FROM cnpg_pg_stat_archiver_failed_count WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), last_arch AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS last_archived_epoch\n  FROM cnpg_pg_stat_archiver_last_archived_time WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), last_fail AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS last_failed_epoch\n  FROM cnpg_pg_stat_archiver_last_failed_time WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), reset AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS reset_epoch\n  FROM cnpg_pg_stat_archiver_stats_reset_time WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n)\nSELECT\n  a.pod_name AS \"Instance\",\n  a.role AS \"Role\",\n  a.archived_total AS \"Archived Total\",\n  f.failed_total AS \"Failed Total\",\n  to_timestamp(NULLIF(la.last_archived_epoch, 0)) AS \"Last Archived\",\n  to_timestamp(NULLIF(lf.last_failed_epoch, 0)) AS \"Last Failed\",\n  round(((extract(epoch FROM now()) - r.reset_epoch) / 3600.0)::numeric, 1) AS \"Stats Reset Age (hrs)\"\nFROM archived a\nLEFT JOIN failed f ON f.pod_name = a.pod_name\nLEFT JOIN last_arch la ON la.pod_name = a.pod_name\nLEFT JOIN last_fail lf ON lf.pod_name = a.pod_name\nLEFT JOIN reset r ON r.pod_name = a.pod_name\nORDER BY \"Instance\"",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Archiver Detail",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 92
+      },
+      "id": 26,
+      "panels": [],
+      "title": "Connections & Activity",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 70,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 93
+      },
+      "id": 27,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, state AS metric, sum(gauge) AS value\nFROM cnpg_backends_total\nWHERE $__timeFilter(time) AND pod_name IN ($instance)\nGROUP BY time, state\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Backends by State",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 93
+      },
+      "id": 28,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, pod_name AS metric, gauge AS value\nFROM cnpg_backends_waiting_total\nWHERE $__timeFilter(time) AND pod_name IN ($instance)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, pod_name || ' / ' || datname AS metric, gauge AS value\nFROM cnpg_backends_max_tx_duration_seconds\nWHERE $__timeFilter(time) AND pod_name IN ($instance)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Backends Waiting / Max Transaction Duration",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 101
+      },
+      "id": 29,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT\n  pod_name AS \"Instance\",\n  datname AS \"Database\",\n  usename AS \"User\",\n  state AS \"State\",\n  application_name AS \"Application\",\n  gauge AS \"Connections\"\nFROM (\n  SELECT DISTINCT ON (pod_name, datname, usename, state, application_name)\n    pod_name, datname, usename, state, application_name, gauge\n  FROM cnpg_backends_total\n  WHERE pod_name IN ($instance)\n  ORDER BY pod_name, datname, usename, state, application_name, time DESC\n) latest\nWHERE gauge > 0\nORDER BY \"Instance\", \"Database\", \"State\"",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Connections by Database / State / User",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 101
+      },
+      "id": 30,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name, datname,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_database_xact_commit\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name, datname ORDER BY time)\n)\nSELECT time, pod_name || ' / ' || datname || ' commit' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name, datname,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_database_xact_rollback\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name, datname ORDER BY time)\n)\nSELECT time, pod_name || ' / ' || datname || ' rollback' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Transaction Commit / Rollback Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 109
+      },
+      "id": 31,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name, datname,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_database_tup_fetched\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name, datname ORDER BY time)\n)\nSELECT time, pod_name || ' / ' || datname || ' fetched' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name, datname,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_database_tup_returned\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name, datname ORDER BY time)\n)\nSELECT time, pod_name || ' / ' || datname || ' returned' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name, datname,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_database_tup_inserted\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name, datname ORDER BY time)\n)\nSELECT time, pod_name || ' / ' || datname || ' inserted' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name, datname,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_database_tup_updated\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name, datname ORDER BY time)\n)\nSELECT time, pod_name || ' / ' || datname || ' updated' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "D",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name, datname,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_database_tup_deleted\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name, datname ORDER BY time)\n)\nSELECT time, pod_name || ' / ' || datname || ' deleted' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "E",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Tuple Activity Rate",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 117
+      },
+      "id": 32,
+      "panels": [],
+      "title": "Cache & IO",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 118
+      },
+      "id": 33,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT h.time, h.pod_name || ' / ' || h.datname AS metric,\n  (h.counter::float8 / NULLIF(h.counter + r.counter, 0)) * 100 AS value\nFROM cnpg_pg_stat_database_blks_hit h\nJOIN cnpg_pg_stat_database_blks_read r\n  ON r.pod_name = h.pod_name AND r.datname = h.datname AND r.time = h.time\nWHERE $__timeFilter(h.time) AND h.pod_name IN ($instance)\nORDER BY h.time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Postgres Buffer Cache Hit Ratio",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 118
+      },
+      "id": 34,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT to_timestamp(floor(extract(epoch FROM time) / 300) * 300) AS time,\n  pod_name || ' hits' AS metric, avg(gauge) * 100 AS value\nFROM cnpg_cache_hits\nWHERE $__timeFilter(time) AND pod_name IN ($instance)\nGROUP BY 1, pod_name\nORDER BY 1",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT to_timestamp(floor(extract(epoch FROM time) / 300) * 300) AS time,\n  pod_name || ' misses' AS metric, avg(gauge) * 100 AS value\nFROM cnpg_cache_miss\nWHERE $__timeFilter(time) AND pod_name IN ($instance)\nGROUP BY 1, pod_name\nORDER BY 1",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Collector-Internal Cache Hit Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 126
+      },
+      "id": 35,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time, pod_name, datname,\n    (counter - lag(counter) OVER w) * 8192 / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_database_blks_read\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name, datname ORDER BY time)\n)\nSELECT time, pod_name || ' / ' || datname AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Disk Block Read Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 126
+      },
+      "id": 36,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name, datname,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_database_blk_read_time\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name, datname ORDER BY time)\n)\nSELECT time, pod_name || ' / ' || datname || ' read' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name, datname,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_database_blk_write_time\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name, datname ORDER BY time)\n)\nSELECT time, pod_name || ' / ' || datname || ' write' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Block I/O Time by Database",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "Bps"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ops"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 134
+      },
+      "id": 37,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name, datname,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_database_temp_bytes\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name, datname ORDER BY time)\n)\nSELECT time, pod_name || ' / ' || datname || ' bytes' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name, datname,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_database_temp_files\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name, datname ORDER BY time)\n)\nSELECT time, pod_name || ' / ' || datname || ' files' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Temp File Usage",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 142
+      },
+      "id": 38,
+      "panels": [],
+      "title": "Storage & Wraparound",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 143
+      },
+      "id": 39,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, pod_name || ' / ' || datname AS metric, gauge AS value\nFROM cnpg_pg_database_size_bytes\nWHERE $__timeFilter(time) AND pod_name IN ($instance)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Database Size",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 143
+      },
+      "id": 40,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, pod_name || ' / ' || datname || ' xid' AS metric, gauge AS value\nFROM cnpg_pg_database_xid_age\nWHERE $__timeFilter(time) AND pod_name IN ($instance)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, pod_name || ' / ' || datname || ' mxid' AS metric, gauge AS value\nFROM cnpg_pg_database_mxid_age\nWHERE $__timeFilter(time) AND pod_name IN ($instance)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "XID / MXID Wraparound Age",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 151
+      },
+      "id": 41,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH lo AS (\n  SELECT DISTINCT ON (pod_name, datname) pod_name, datname, gauge AS lo_pages\n  FROM cnpg_collector_lo_pages WHERE pod_name IN ($instance)\n  ORDER BY pod_name, datname, time DESC\n), nodes AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS nodes_used\n  FROM cnpg_collector_nodes_used WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n)\nSELECT\n  lo.pod_name AS \"Instance\",\n  lo.datname AS \"Database\",\n  lo.lo_pages AS \"Large Object Pages\",\n  n.nodes_used AS \"K8s Nodes Used\"\nFROM lo\nLEFT JOIN nodes n ON n.pod_name = lo.pod_name\nORDER BY \"Instance\", \"Database\"",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Large Object Pages & K8s Nodes Used",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 151
+      },
+      "id": 42,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH latest AS (\n  SELECT DISTINCT ON (pod_name, datname, extname)\n    pod_name, datname, extname, installed_version, default_version\n  FROM cnpg_pg_extensions_update_available\n  WHERE pod_name IN ($instance)\n  ORDER BY pod_name, datname, extname, time DESC\n)\nSELECT\n  pod_name AS \"Instance\",\n  datname AS \"Database\",\n  extname AS \"Extension\",\n  installed_version AS \"Installed\",\n  default_version AS \"Available\"\nFROM latest\nWHERE installed_version IS DISTINCT FROM default_version\nORDER BY \"Instance\", \"Database\", \"Extension\"",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Extensions With Updates Available",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 159
+      },
+      "id": 43,
+      "panels": [],
+      "title": "Collector Health",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 160
+      },
+      "id": 44,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, pod_name || ' / ' || collector AS metric, gauge AS value\nFROM cnpg_collector_collection_duration_seconds\nWHERE $__timeFilter(time) AND pod_name IN ($instance)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Collection Duration",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 160
+      },
+      "id": 45,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_collector_collections_total\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name ORDER BY time)\n)\nSELECT time, pod_name AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Collections Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 168
+      },
+      "id": 46,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, pod_name AS metric, extract(epoch FROM time) - gauge AS value\nFROM cnpg_last_update_timestamp\nWHERE $__timeFilter(time) AND pod_name IN ($instance)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Metrics Freshness",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 168
+      },
+      "id": 47,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name, datname,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_database_conflicts\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name, datname ORDER BY time)\n)\nSELECT time, pod_name || ' / ' || datname || ' conflicts' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name, datname,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_database_deadlocks\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name, datname ORDER BY time)\n)\nSELECT time, pod_name || ' / ' || datname || ' deadlocks' AS metric, value FROM deltas ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Database Conflicts / Deadlocks Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 176
+      },
+      "id": 48,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH ver AS (\n  SELECT DISTINCT ON (pod_name) pod_name, \"full\" AS pg_version\n  FROM cnpg_collector_postgres_version WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), bg_reset AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS bgwriter_reset\n  FROM cnpg_pg_stat_bgwriter_stats_reset_time WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), cp_reset AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS checkpointer_reset\n  FROM cnpg_pg_stat_checkpointer_stats_reset_time WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), arch_reset AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS archiver_reset\n  FROM cnpg_pg_stat_archiver_stats_reset_time WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n)\nSELECT\n  v.pod_name AS \"Instance\",\n  v.pg_version AS \"PG Version\",\n  round(((extract(epoch FROM now()) - b.bgwriter_reset) / 3600.0)::numeric, 1) AS \"Bgwriter Reset Age (hrs)\",\n  round(((extract(epoch FROM now()) - c.checkpointer_reset) / 3600.0)::numeric, 1) AS \"Checkpointer Reset Age (hrs)\",\n  round(((extract(epoch FROM now()) - a.archiver_reset) / 3600.0)::numeric, 1) AS \"Archiver Reset Age (hrs)\"\nFROM ver v\nLEFT JOIN bg_reset b ON b.pod_name = v.pod_name\nLEFT JOIN cp_reset c ON c.pod_name = v.pod_name\nLEFT JOIN arch_reset a ON a.pod_name = v.pod_name\nORDER BY \"Instance\"",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Version & Stats Reset Age",
+      "type": "table"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 42,
+  "tags": [
+    "cnpg",
+    "postgresql",
+    "database"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "datasource": {
+          "type": "postgres",
+          "uid": "postgres-telegraf"
+        },
+        "definition": "SELECT DISTINCT pod_name FROM cnpg_collector_up WHERE pod_name IS NOT NULL ORDER BY 1",
+        "includeAll": true,
+        "label": "Instance",
+        "multi": true,
+        "name": "instance",
+        "options": [],
+        "query": "SELECT DISTINCT pod_name FROM cnpg_collector_up WHERE pod_name IS NOT NULL ORDER BY 1",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "CNPG Postgres",
+  "uid": "cnpg-postgres",
+  "version": 1,
+  "weekStart": ""
+}
