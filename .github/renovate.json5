@@ -92,6 +92,7 @@
         'yannh/kubeconform',
         'getsops/sops',
         'python',
+        'python/cpython',
         'ingress-nginx',
         'csi-driver-smb',
         'adguard/adguardhome',
