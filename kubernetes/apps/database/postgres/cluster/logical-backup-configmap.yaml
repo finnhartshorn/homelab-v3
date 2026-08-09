@@ -6,6 +6,11 @@ data:
   dump.sh: |
     set -eu
 
+    # Clear any partial dumps left behind by a prior failed attempt in this
+    # pod (initContainer restarts reuse the same /backup emptyDir), so a
+    # retry never uploads a stale/empty file alongside the good one.
+    rm -f /backup/*.dump
+
     for db in windmill quizzer; do
       echo "dumping $db"
       pg_dump -h postgres-rw.database.svc.cluster.local -Fc -f "/backup/${db}_$(date +%Y%m%d%H%M%S).dump" "$db"
