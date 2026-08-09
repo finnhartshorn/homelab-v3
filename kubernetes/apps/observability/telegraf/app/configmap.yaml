@@ -58,12 +58,17 @@ data:
       kubernetes_label_selector = "io.cilium/app=operator"
       namedrop = ["cilium_operator_feature_*"]
 
+    # namedrop excludes blk_read_time/blk_write_time: pg_stat_database's I/O
+    # timing columns, which stay permanently 0 because track_io_timing is
+    # off on this cluster (the cost of enabling it isn't worth it, so these
+    # never carry real data).
     [[inputs.prometheus]]
       monitor_kubernetes_pods = true
       monitor_kubernetes_pods_method = "settings"
       monitor_kubernetes_pods_namespace = "database"
       monitor_kubernetes_pods_port = 9187
       kubernetes_label_selector = "cnpg.io/cluster=postgres"
+      namedrop = ["cnpg_pg_stat_database_blk_read_time", "cnpg_pg_stat_database_blk_write_time"]
 
     [[inputs.prometheus]]
       monitor_kubernetes_pods = true
