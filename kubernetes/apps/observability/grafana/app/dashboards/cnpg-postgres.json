@@ -1304,7 +1304,7 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "rawSql": "WITH wal_count AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS wal_files\n  FROM cnpg_collector_pg_wal WHERE value = 'count' AND pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), wal_size AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS wal_size_bytes\n  FROM cnpg_collector_pg_wal WHERE value = 'size' AND pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), ready AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS ready_files\n  FROM cnpg_collector_pg_wal_archive_status WHERE value = 'ready' AND pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), done AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS done_files\n  FROM cnpg_collector_pg_wal_archive_status WHERE value = 'done' AND pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n)\nSELECT\n  wc.pod_name AS \"Instance\",\n  wc.wal_files AS \"WAL Files\",\n  ws.wal_size_bytes AS \"WAL Size\",\n  r.ready_files AS \"Ready to Archive\",\n  d.done_files AS \"Archived (done)\"\nFROM wal_count wc\nLEFT JOIN wal_size ws ON ws.pod_name = wc.pod_name\nLEFT JOIN ready r ON r.pod_name = wc.pod_name\nLEFT JOIN done d ON d.pod_name = wc.pod_name\nORDER BY \"Instance\"",
+          "rawSql": "WITH wal_count AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS wal_files\n  FROM cnpg_collector_pg_wal WHERE value = 'count' AND pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), wal_size AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS wal_size_bytes\n  FROM cnpg_collector_pg_wal WHERE value = 'size' AND pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n)\nSELECT\n  wc.pod_name AS \"Instance\",\n  wc.wal_files AS \"WAL Files\",\n  ws.wal_size_bytes AS \"WAL Size\"\nFROM wal_count wc\nLEFT JOIN wal_size ws ON ws.pod_name = wc.pod_name\nORDER BY \"Instance\"",
           "format": "table",
           "rawQuery": true,
           "refId": "A",
@@ -1314,7 +1314,7 @@
           }
         }
       ],
-      "title": "WAL Files & Archive Status",
+      "title": "WAL Files",
       "type": "table"
     },
     {
@@ -1689,390 +1689,6 @@
         "x": 0,
         "y": 71
       },
-      "id": 21,
-      "panels": [],
-      "title": "Backups & Archiving",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "postgres",
-        "uid": "postgres-telegraf"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "h"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 24,
-        "x": 0,
-        "y": 72
-      },
-      "id": 22,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "rawSql": "SELECT round(((extract(epoch FROM now()) - gauge) / 3600.0)::numeric, 1) AS \"First Recoverability Point Age (hrs)\"\nFROM cnpg_collector_first_recoverability_point\nWHERE role = 'primary' AND gauge > 0\nORDER BY time DESC\nLIMIT 1",
-          "format": "table",
-          "rawQuery": true,
-          "refId": "A",
-          "datasource": {
-            "type": "postgres",
-            "uid": "postgres-telegraf"
-          }
-        },
-        {
-          "rawSql": "SELECT round(((extract(epoch FROM now()) - gauge) / 3600.0)::numeric, 1) AS \"Last Available Backup Age (hrs)\"\nFROM cnpg_collector_last_available_backup_timestamp\nWHERE role = 'primary' AND gauge > 0\nORDER BY time DESC\nLIMIT 1",
-          "format": "table",
-          "rawQuery": true,
-          "refId": "B",
-          "datasource": {
-            "type": "postgres",
-            "uid": "postgres-telegraf"
-          }
-        },
-        {
-          "rawSql": "SELECT round(((extract(epoch FROM now()) - gauge) / 3600.0)::numeric, 1) AS \"Last Failed Backup Age (hrs)\"\nFROM cnpg_collector_last_failed_backup_timestamp\nWHERE role = 'primary' AND gauge > 0\nORDER BY time DESC\nLIMIT 1",
-          "format": "table",
-          "rawQuery": true,
-          "refId": "C",
-          "datasource": {
-            "type": "postgres",
-            "uid": "postgres-telegraf"
-          }
-        }
-      ],
-      "title": "Backup Freshness",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "postgres",
-        "uid": "postgres-telegraf"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "showValues": false,
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "ops"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 76
-      },
-      "id": 23,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_archiver_archived_count\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name ORDER BY time)\n)\nSELECT time, pod_name || ' archived' AS metric, value FROM deltas ORDER BY time",
-          "format": "time_series",
-          "rawQuery": true,
-          "refId": "A",
-          "datasource": {
-            "type": "postgres",
-            "uid": "postgres-telegraf"
-          }
-        },
-        {
-          "rawSql": "WITH deltas AS (\n  SELECT\n    time,\n    pod_name,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS value\n  FROM cnpg_pg_stat_archiver_failed_count\n  WHERE $__timeFilter(time) AND pod_name IN ($instance)\n  WINDOW w AS (PARTITION BY pod_name ORDER BY time)\n)\nSELECT time, pod_name || ' failed' AS metric, value FROM deltas ORDER BY time",
-          "format": "time_series",
-          "rawQuery": true,
-          "refId": "B",
-          "datasource": {
-            "type": "postgres",
-            "uid": "postgres-telegraf"
-          }
-        }
-      ],
-      "title": "WAL Archiving Rate",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "postgres",
-        "uid": "postgres-telegraf"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "showValues": false,
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 76
-      },
-      "id": 24,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "rawSql": "SELECT time, pod_name || ' since_archival' AS metric, gauge AS value\nFROM cnpg_pg_stat_archiver_seconds_since_last_archival\nWHERE $__timeFilter(time) AND pod_name IN ($instance)\nORDER BY time",
-          "format": "time_series",
-          "rawQuery": true,
-          "refId": "A",
-          "datasource": {
-            "type": "postgres",
-            "uid": "postgres-telegraf"
-          }
-        },
-        {
-          "rawSql": "SELECT time, pod_name || ' since_failure' AS metric, gauge AS value\nFROM cnpg_pg_stat_archiver_seconds_since_last_failure\nWHERE $__timeFilter(time) AND pod_name IN ($instance)\nORDER BY time",
-          "format": "time_series",
-          "rawQuery": true,
-          "refId": "B",
-          "datasource": {
-            "type": "postgres",
-            "uid": "postgres-telegraf"
-          }
-        }
-      ],
-      "title": "Seconds Since Last Archival / Failure",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "postgres",
-        "uid": "postgres-telegraf"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 84
-      },
-      "id": 25,
-      "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": [
-            "sum"
-          ],
-          "show": false
-        },
-        "showHeader": true
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "rawSql": "WITH archived AS (\n  SELECT DISTINCT ON (pod_name) pod_name, role, counter AS archived_total\n  FROM cnpg_pg_stat_archiver_archived_count WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), failed AS (\n  SELECT DISTINCT ON (pod_name) pod_name, counter AS failed_total\n  FROM cnpg_pg_stat_archiver_failed_count WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), last_arch AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS last_archived_epoch\n  FROM cnpg_pg_stat_archiver_last_archived_time WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), last_fail AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS last_failed_epoch\n  FROM cnpg_pg_stat_archiver_last_failed_time WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n), reset AS (\n  SELECT DISTINCT ON (pod_name) pod_name, gauge AS reset_epoch\n  FROM cnpg_pg_stat_archiver_stats_reset_time WHERE pod_name IN ($instance)\n  ORDER BY pod_name, time DESC\n)\nSELECT\n  a.pod_name AS \"Instance\",\n  a.role AS \"Role\",\n  a.archived_total AS \"Archived Total\",\n  f.failed_total AS \"Failed Total\",\n  to_timestamp(NULLIF(la.last_archived_epoch, 0)) AS \"Last Archived\",\n  to_timestamp(NULLIF(lf.last_failed_epoch, 0)) AS \"Last Failed\",\n  round(((extract(epoch FROM now()) - r.reset_epoch) / 3600.0)::numeric, 1) AS \"Stats Reset Age (hrs)\"\nFROM archived a\nLEFT JOIN failed f ON f.pod_name = a.pod_name\nLEFT JOIN last_arch la ON la.pod_name = a.pod_name\nLEFT JOIN last_fail lf ON lf.pod_name = a.pod_name\nLEFT JOIN reset r ON r.pod_name = a.pod_name\nORDER BY \"Instance\"",
-          "format": "table",
-          "rawQuery": true,
-          "refId": "A",
-          "datasource": {
-            "type": "postgres",
-            "uid": "postgres-telegraf"
-          }
-        }
-      ],
-      "title": "Archiver Detail",
-      "type": "table"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 92
-      },
       "id": 26,
       "panels": [],
       "title": "Connections & Activity",
@@ -2143,7 +1759,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 93
+        "y": 72
       },
       "id": 27,
       "options": {
@@ -2257,7 +1873,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 93
+        "y": 72
       },
       "id": 28,
       "options": {
@@ -2337,7 +1953,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 101
+        "y": 80
       },
       "id": 29,
       "options": {
@@ -2434,7 +2050,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 101
+        "y": 80
       },
       "id": 30,
       "options": {
@@ -2542,7 +2158,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 109
+        "y": 88
       },
       "id": 31,
       "options": {
@@ -2620,7 +2236,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 117
+        "y": 96
       },
       "id": 32,
       "panels": [],
@@ -2693,7 +2309,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 118
+        "y": 97
       },
       "id": 33,
       "options": {
@@ -2791,7 +2407,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 118
+        "y": 97
       },
       "id": 34,
       "options": {
@@ -2899,7 +2515,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 126
+        "y": 105
       },
       "id": 35,
       "options": {
@@ -3014,7 +2630,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 134
+        "y": 113
       },
       "id": 37,
       "options": {
@@ -3062,7 +2678,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 142
+        "y": 121
       },
       "id": 38,
       "panels": [],
@@ -3135,7 +2751,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 143
+        "y": 122
       },
       "id": 39,
       "options": {
@@ -3233,7 +2849,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 143
+        "y": 122
       },
       "id": 40,
       "options": {
@@ -3313,7 +2929,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 151
+        "y": 130
       },
       "id": 41,
       "options": {
@@ -3382,7 +2998,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 151
+        "y": 130
       },
       "id": 42,
       "options": {
@@ -3419,7 +3035,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 159
+        "y": 138
       },
       "id": 43,
       "panels": [],
@@ -3492,7 +3108,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 160
+        "y": 139
       },
       "id": 44,
       "options": {
@@ -3590,7 +3206,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 160
+        "y": 139
       },
       "id": 45,
       "options": {
@@ -3688,7 +3304,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 168
+        "y": 147
       },
       "id": 46,
       "options": {
@@ -3786,7 +3402,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 168
+        "y": 147
       },
       "id": 47,
       "options": {
@@ -3866,7 +3482,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 176
+        "y": 155
       },
       "id": 48,
       "options": {
