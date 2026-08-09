@@ -76,20 +76,3 @@ spec:
         login: true
         passwordSecret:
           name: grafana-ro-credentials
-
-  backup:
-    barmanObjectStore:
-      destinationPath: s3://cnpg-backups/
-      endpointURL: http://192.168.1.241:9000
-      s3Credentials:
-        accessKeyId:
-          name: cnpg-minio-secret
-          key: ACCESS_KEY_ID
-        secretAccessKey:
-          name: cnpg-minio-secret
-          key: ACCESS_SECRET_KEY
-      wal:
-        compression: gzip
-      data:
-        compression: gzip
-    retentionPolicy: "30d"
