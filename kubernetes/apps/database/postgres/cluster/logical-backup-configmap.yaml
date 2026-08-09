@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-logical-backup-scripts
+data:
+  dump.sh: |
+    set -eu
+
+    for db in windmill quizzer; do
+      echo "dumping $db"
+      pg_dump -h postgres-rw.database.svc.cluster.local -Fc -f "/backup/${db}_$(date +%Y%m%d%H%M%S).dump" "$db"
+    done
+  upload.sh: |
+    set -eu
+
+    mc alias set local "$MC_HOST_URL" "$ACCESS_KEY_ID" "$ACCESS_SECRET_KEY"
+    mc cp /backup/*.dump "local/cnpg-backups/logical/"
+    mc find "local/cnpg-backups/logical/" --older-than 30d --exec "mc rm {}"

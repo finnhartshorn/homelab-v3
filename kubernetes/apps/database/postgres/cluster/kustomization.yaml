@@ -16,4 +16,6 @@ resources:
   - ./database-telegraf.yaml
   - ./hypertable-maintenance-configmap.yaml
   - ./hypertable-maintenance-cronjob.yaml
+  - ./logical-backup-configmap.yaml
+  - ./logical-backup-cronjob.yaml
   - ./loadbalancer.yaml
