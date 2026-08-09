@@ -6,7 +6,11 @@ metadata:
   name: &app postgres
   namespace: flux-system
   # The logical-backup script's shell variables (${db}) would otherwise
-  # collide with Flux's own ${VAR} postBuild substitution.
+  # collide with Flux's own ${VAR} postBuild substitution. This label opts
+  # this Kustomization out of the cluster-apps patch that would otherwise
+  # add both postBuild.substituteFrom AND decryption together (see
+  # kubernetes/flux/cluster/ks.yaml) - so decryption must be declared
+  # explicitly below, since this dir has several sops-encrypted Secrets.
   labels:
     substitution.flux.home.arpa/disabled: "true"
 spec:
@@ -21,6 +25,10 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
   wait: false
   interval: 30m
   timeout: 5m
