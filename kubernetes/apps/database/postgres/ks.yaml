@@ -5,6 +5,10 @@ kind: Kustomization
 metadata:
   name: &app postgres
   namespace: flux-system
+  # The logical-backup script's shell variables (${db}) would otherwise
+  # collide with Flux's own ${VAR} postBuild substitution.
+  labels:
+    substitution.flux.home.arpa/disabled: "true"
 spec:
   targetNamespace: database
   commonMetadata:
