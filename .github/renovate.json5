@@ -21,6 +21,19 @@
   ignorePaths: [
     '**/*.sops.*',
   ],
+  // code.forgejo.org intermittently rate-limits/blocks Renovate's lookup
+  // requests, surfacing as spurious "Failed to look up ... no-result"
+  // dependency dashboard warnings (this is worse for us than most repos
+  // since :disableRateLimiting is set above). Throttling requests to this
+  // host specifically works around it.
+  // See: https://github.com/renovatebot/renovate/discussions/42144
+  hostRules: [
+    {
+      matchHost: 'code.forgejo.org',
+      concurrentRequestLimit: 1,
+      maxRequestsPerSecond: 1,
+    },
+  ],
   flux: {
     managerFilePatterns: [
       '/(^|/)kubernetes/.+\\.ya?ml(?:\\.j2)?$/',
