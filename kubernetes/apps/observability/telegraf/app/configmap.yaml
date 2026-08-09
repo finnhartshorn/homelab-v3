@@ -58,17 +58,26 @@ data:
       kubernetes_label_selector = "io.cilium/app=operator"
       namedrop = ["cilium_operator_feature_*"]
 
-    # namedrop excludes blk_read_time/blk_write_time: pg_stat_database's I/O
-    # timing columns, which stay permanently 0 because track_io_timing is
-    # off on this cluster (the cost of enabling it isn't worth it, so these
-    # never carry real data).
+    # namedrop excludes:
+    # - blk_read_time/blk_write_time: pg_stat_database's I/O timing columns,
+    #   which stay permanently 0 because track_io_timing is off on this
+    #   cluster (the cost of enabling it isn't worth it, so these never
+    #   carry real data).
+    # - archiver/backup metrics: physical backup + WAL archiving was removed
+    #   in favor of per-database logical (pg_dump) backups, which aren't
+    #   CNPG-managed and so aren't exposed via these metrics. CNPG's
+    #   archive_command wrapper still exits 0 with no backup destination
+    #   configured, so archived_count/last_archived_time etc. would keep
+    #   climbing as if archiving were succeeding - misleading, not just
+    #   unused. cnpg_pg_stat_archiver_stats_reset_time is kept since it's
+    #   still used by the "Version & Stats Reset Age" panel.
     [[inputs.prometheus]]
       monitor_kubernetes_pods = true
       monitor_kubernetes_pods_method = "settings"
       monitor_kubernetes_pods_namespace = "database"
       monitor_kubernetes_pods_port = 9187
       kubernetes_label_selector = "cnpg.io/cluster=postgres"
-      namedrop = ["cnpg_pg_stat_database_blk_read_time", "cnpg_pg_stat_database_blk_write_time"]
+      namedrop = ["cnpg_pg_stat_database_blk_read_time", "cnpg_pg_stat_database_blk_write_time", "cnpg_pg_stat_archiver_archived_count", "cnpg_pg_stat_archiver_failed_count", "cnpg_pg_stat_archiver_last_archived_time", "cnpg_pg_stat_archiver_last_failed_time", "cnpg_pg_stat_archiver_seconds_since_last_archival", "cnpg_pg_stat_archiver_seconds_since_last_failure", "cnpg_collector_pg_wal_archive_status", "cnpg_collector_first_recoverability_point", "cnpg_collector_last_available_backup_timestamp", "cnpg_collector_last_failed_backup_timestamp"]
 
     [[inputs.prometheus]]
       monitor_kubernetes_pods = true
