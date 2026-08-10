@@ -292,7 +292,7 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "rawSql": "SELECT count(*) AS \"Replicas Rebuilding\"\nFROM (\n  SELECT DISTINCT ON (replica) replica, mode, gauge\n  FROM longhorn_engine_replica_mode\n  ORDER BY replica, time DESC\n) latest\nWHERE gauge = 1 AND mode != 'RW'",
+          "rawSql": "SELECT count(*) AS \"Replicas Rebuilding\"\nFROM (\n  SELECT DISTINCT ON (replica) replica, mode, gauge\n  FROM longhorn_engine_replica_mode\n  WHERE time > now() - interval '5 minutes'\n  ORDER BY replica, time DESC\n) latest\nWHERE gauge = 1 AND mode = 'WO'",
           "format": "table",
           "rawQuery": true,
           "refId": "A",
