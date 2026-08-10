@@ -22,6 +22,8 @@ spec:
       name: telegraf
     controllers:
       main:
+        annotations:
+          reloader.stakater.com/auto: "true"
         containers:
           app:
             image:

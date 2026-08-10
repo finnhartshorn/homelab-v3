@@ -160,6 +160,16 @@ data:
       [inputs.prometheus.tags]
         node = "node3"
 
+    # Gaming/dev desktop (not a cluster member, so a static url rather than
+    # kubernetes_pods discovery) - windows_exporter for OS/CPU/GPU-engine
+    # metrics and nvidia_gpu_exporter (NVML) for GPU temp/power/clocks,
+    # which windows_exporter doesn't expose at all.
+    [[inputs.prometheus]]
+      urls = ["http://192.168.1.211:9182/metrics"]
+
+    [[inputs.prometheus]]
+      urls = ["http://192.168.1.211:9835/metrics"]
+
     [[inputs.influxdb_v2_listener]]
       service_address = ":8186"
       token = "$${TELEGRAF_LISTENER_TOKEN}"
