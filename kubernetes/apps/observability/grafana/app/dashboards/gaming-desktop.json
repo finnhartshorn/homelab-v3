@@ -4228,6 +4228,2450 @@
       ],
       "title": "Swap Page Operations (per second)",
       "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 155
+      },
+      "id": 55,
+      "panels": [],
+      "title": "Disk: Volume Capacity & Queue",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Size"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Free"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Used %"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 156
+      },
+      "id": 56,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH free AS (\n  SELECT DISTINCT ON (volume) volume, gauge AS free_bytes FROM windows_logical_disk_free_bytes WHERE volume IN ($volume) ORDER BY volume, time DESC\n), size AS (\n  SELECT DISTINCT ON (volume) volume, gauge AS size_bytes FROM windows_logical_disk_size_bytes WHERE volume IN ($volume) ORDER BY volume, time DESC\n), info AS (\n  SELECT DISTINCT ON (volume) volume, disk, filesystem, type, volume_name, serial_number FROM windows_logical_disk_info WHERE volume IN ($volume) ORDER BY volume, time DESC\n)\nSELECT s.volume AS \"Volume\", i.volume_name AS \"Label\", i.filesystem AS \"FS\", i.type AS \"Type\", i.disk AS \"Physical Disk\",\n  s.size_bytes AS \"Size\", f.free_bytes AS \"Free\",\n  round(((s.size_bytes - f.free_bytes) / NULLIF(s.size_bytes,0) * 100)::numeric, 1) AS \"Used %\"\nFROM size s\nJOIN free f USING (volume)\nJOIN info i USING (volume)\nORDER BY s.volume",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Logical Disk Capacity",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 164
+      },
+      "id": 57,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, volume AS metric, gauge AS value\nFROM windows_logical_disk_free_bytes\nWHERE $__timeFilter(time) AND volume IN ($volume)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Volume Free Space Over Time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 164
+      },
+      "id": 58,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, volume || ' \u2014 current' AS metric, gauge AS value\nFROM windows_logical_disk_requests_queued\nWHERE $__timeFilter(time) AND volume IN ($volume)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, volume,\n    (gauge - lag(gauge) OVER (PARTITION BY volume ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (PARTITION BY volume ORDER BY time))) AS rate\n  FROM windows_logical_disk_avg_read_requests_queued\n  WHERE $__timeFilter(time) AND volume IN ($volume)\n)\nSELECT time, volume || ' \u2014 avg read' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, volume,\n    (gauge - lag(gauge) OVER (PARTITION BY volume ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (PARTITION BY volume ORDER BY time))) AS rate\n  FROM windows_logical_disk_avg_write_requests_queued\n  WHERE $__timeFilter(time) AND volume IN ($volume)\n)\nSELECT time, volume || ' \u2014 avg write' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Disk Queue Length (Current / Avg Read / Avg Write)",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 172
+      },
+      "id": 59,
+      "panels": [],
+      "title": "Disk: Volume IOPS, Throughput & Latency",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "iops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 173
+      },
+      "id": 60,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, volume,\n    (counter - lag(counter) OVER (PARTITION BY volume ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (PARTITION BY volume ORDER BY time))) AS rate\n  FROM windows_logical_disk_reads_total\n  WHERE $__timeFilter(time) AND volume IN ($volume)\n)\nSELECT time, volume || ' \u2014 read' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, volume,\n    (counter - lag(counter) OVER (PARTITION BY volume ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (PARTITION BY volume ORDER BY time))) AS rate\n  FROM windows_logical_disk_writes_total\n  WHERE $__timeFilter(time) AND volume IN ($volume)\n)\nSELECT time, volume || ' \u2014 write' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Volume IOPS (Read/Write)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 173
+      },
+      "id": 61,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, volume,\n    (counter - lag(counter) OVER (PARTITION BY volume ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (PARTITION BY volume ORDER BY time))) AS rate\n  FROM windows_logical_disk_read_bytes_total\n  WHERE $__timeFilter(time) AND volume IN ($volume)\n)\nSELECT time, volume || ' \u2014 read' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, volume,\n    (counter - lag(counter) OVER (PARTITION BY volume ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (PARTITION BY volume ORDER BY time))) AS rate\n  FROM windows_logical_disk_write_bytes_total\n  WHERE $__timeFilter(time) AND volume IN ($volume)\n)\nSELECT time, volume || ' \u2014 write' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Volume Throughput (Read/Write)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 173
+      },
+      "id": 62,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH r AS (\n  SELECT time, volume, counter AS read_c FROM windows_logical_disk_read_seconds_total WHERE $__timeFilter(time) AND volume IN ($volume)\n), w AS (\n  SELECT time, volume, counter AS write_c FROM windows_logical_disk_write_seconds_total WHERE $__timeFilter(time) AND volume IN ($volume)\n), joined AS (\n  SELECT r.time, r.volume, read_c, write_c FROM r JOIN w ON r.time = w.time AND r.volume = w.volume\n), deltas AS (\n  SELECT time, volume,\n    (read_c - lag(read_c) OVER (PARTITION BY volume ORDER BY time) + write_c - lag(write_c) OVER (PARTITION BY volume ORDER BY time))\n    / extract(epoch FROM (time - lag(time) OVER (PARTITION BY volume ORDER BY time))) * 100 AS busy_pct\n  FROM joined\n)\nSELECT time, volume AS metric, busy_pct AS value FROM deltas WHERE busy_pct IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Volume Busy % (Read/Write)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 181
+      },
+      "id": 63,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH lat AS (\n  SELECT time, volume, counter AS lat_c FROM windows_logical_disk_read_latency_seconds_total WHERE $__timeFilter(time) AND volume IN ($volume)\n), cnt AS (\n  SELECT time, volume, counter AS cnt_c FROM windows_logical_disk_reads_total WHERE $__timeFilter(time) AND volume IN ($volume)\n), joined AS (\n  SELECT lat.time, lat.volume, lat_c, cnt_c FROM lat JOIN cnt ON lat.time = cnt.time AND lat.volume = cnt.volume\n), deltas AS (\n  SELECT time, volume,\n    (lat_c - lag(lat_c) OVER (PARTITION BY volume ORDER BY time)) / NULLIF(cnt_c - lag(cnt_c) OVER (PARTITION BY volume ORDER BY time), 0) * 1000 AS ms\n  FROM joined\n)\nSELECT time, volume || ' \u2014 read' AS metric, ms AS value FROM deltas WHERE ms IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH lat AS (\n  SELECT time, volume, counter AS lat_c FROM windows_logical_disk_write_latency_seconds_total WHERE $__timeFilter(time) AND volume IN ($volume)\n), cnt AS (\n  SELECT time, volume, counter AS cnt_c FROM windows_logical_disk_writes_total WHERE $__timeFilter(time) AND volume IN ($volume)\n), joined AS (\n  SELECT lat.time, lat.volume, lat_c, cnt_c FROM lat JOIN cnt ON lat.time = cnt.time AND lat.volume = cnt.volume\n), deltas AS (\n  SELECT time, volume,\n    (lat_c - lag(lat_c) OVER (PARTITION BY volume ORDER BY time)) / NULLIF(cnt_c - lag(cnt_c) OVER (PARTITION BY volume ORDER BY time), 0) * 1000 AS ms\n  FROM joined\n)\nSELECT time, volume || ' \u2014 write' AS metric, ms AS value FROM deltas WHERE ms IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH lat AS (\n  SELECT time, volume, counter AS lat_c FROM windows_logical_disk_read_write_latency_seconds_total WHERE $__timeFilter(time) AND volume IN ($volume)\n), rw AS (\n  SELECT r.time, r.volume, r.counter + w.counter AS io_c\n  FROM windows_logical_disk_reads_total r\n  JOIN windows_logical_disk_writes_total w ON r.time = w.time AND r.volume = w.volume\n  WHERE $__timeFilter(r.time) AND r.volume IN ($volume)\n), joined AS (\n  SELECT lat.time, lat.volume, lat_c, io_c FROM lat JOIN rw ON lat.time = rw.time AND lat.volume = rw.volume\n), deltas AS (\n  SELECT time, volume,\n    (lat_c - lag(lat_c) OVER (PARTITION BY volume ORDER BY time)) / NULLIF(io_c - lag(io_c) OVER (PARTITION BY volume ORDER BY time), 0) * 1000 AS ms\n  FROM joined\n)\nSELECT time, volume || ' \u2014 combined' AS metric, ms AS value FROM deltas WHERE ms IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Volume Avg Latency (Read/Write/Combined)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 181
+      },
+      "id": 64,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, volume,\n    (counter - lag(counter) OVER (PARTITION BY volume ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (PARTITION BY volume ORDER BY time))) AS rate\n  FROM windows_logical_disk_split_ios_total\n  WHERE $__timeFilter(time) AND volume IN ($volume)\n)\nSELECT time, volume AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Volume Split I/Os (per sec)",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 189
+      },
+      "id": 65,
+      "panels": [],
+      "title": "Disk: Physical IOPS, Throughput & Latency",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "iops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 190
+      },
+      "id": 66,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, disk,\n    (counter - lag(counter) OVER (PARTITION BY disk ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (PARTITION BY disk ORDER BY time))) AS rate\n  FROM windows_physical_disk_reads_total\n  WHERE $__timeFilter(time) AND disk IN ($disk)\n)\nSELECT time, disk || ' \u2014 read' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, disk,\n    (counter - lag(counter) OVER (PARTITION BY disk ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (PARTITION BY disk ORDER BY time))) AS rate\n  FROM windows_physical_disk_writes_total\n  WHERE $__timeFilter(time) AND disk IN ($disk)\n)\nSELECT time, disk || ' \u2014 write' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Physical Disk IOPS (Read/Write)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 190
+      },
+      "id": 67,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, disk,\n    (counter - lag(counter) OVER (PARTITION BY disk ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (PARTITION BY disk ORDER BY time))) AS rate\n  FROM windows_physical_disk_read_bytes_total\n  WHERE $__timeFilter(time) AND disk IN ($disk)\n)\nSELECT time, disk || ' \u2014 read' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, disk,\n    (counter - lag(counter) OVER (PARTITION BY disk ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (PARTITION BY disk ORDER BY time))) AS rate\n  FROM windows_physical_disk_write_bytes_total\n  WHERE $__timeFilter(time) AND disk IN ($disk)\n)\nSELECT time, disk || ' \u2014 write' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Physical Disk Throughput (Read/Write)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 190
+      },
+      "id": 68,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH r AS (\n  SELECT time, disk, counter AS read_c FROM windows_physical_disk_read_seconds_total WHERE $__timeFilter(time) AND disk IN ($disk)\n), w AS (\n  SELECT time, disk, counter AS write_c FROM windows_physical_disk_write_seconds_total WHERE $__timeFilter(time) AND disk IN ($disk)\n), joined AS (\n  SELECT r.time, r.disk, read_c, write_c FROM r JOIN w ON r.time = w.time AND r.disk = w.disk\n), deltas AS (\n  SELECT time, disk,\n    (read_c - lag(read_c) OVER (PARTITION BY disk ORDER BY time) + write_c - lag(write_c) OVER (PARTITION BY disk ORDER BY time))\n    / extract(epoch FROM (time - lag(time) OVER (PARTITION BY disk ORDER BY time))) * 100 AS busy_pct\n  FROM joined\n)\nSELECT time, disk AS metric, busy_pct AS value FROM deltas WHERE busy_pct IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Physical Disk Busy % (Read/Write)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 198
+      },
+      "id": 69,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH lat AS (\n  SELECT time, disk, counter AS lat_c FROM windows_physical_disk_read_latency_seconds_total WHERE $__timeFilter(time) AND disk IN ($disk)\n), cnt AS (\n  SELECT time, disk, counter AS cnt_c FROM windows_physical_disk_reads_total WHERE $__timeFilter(time) AND disk IN ($disk)\n), joined AS (\n  SELECT lat.time, lat.disk, lat_c, cnt_c FROM lat JOIN cnt ON lat.time = cnt.time AND lat.disk = cnt.disk\n), deltas AS (\n  SELECT time, disk,\n    (lat_c - lag(lat_c) OVER (PARTITION BY disk ORDER BY time)) / NULLIF(cnt_c - lag(cnt_c) OVER (PARTITION BY disk ORDER BY time), 0) * 1000 AS ms\n  FROM joined\n)\nSELECT time, disk || ' \u2014 read' AS metric, ms AS value FROM deltas WHERE ms IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH lat AS (\n  SELECT time, disk, counter AS lat_c FROM windows_physical_disk_write_latency_seconds_total WHERE $__timeFilter(time) AND disk IN ($disk)\n), cnt AS (\n  SELECT time, disk, counter AS cnt_c FROM windows_physical_disk_writes_total WHERE $__timeFilter(time) AND disk IN ($disk)\n), joined AS (\n  SELECT lat.time, lat.disk, lat_c, cnt_c FROM lat JOIN cnt ON lat.time = cnt.time AND lat.disk = cnt.disk\n), deltas AS (\n  SELECT time, disk,\n    (lat_c - lag(lat_c) OVER (PARTITION BY disk ORDER BY time)) / NULLIF(cnt_c - lag(cnt_c) OVER (PARTITION BY disk ORDER BY time), 0) * 1000 AS ms\n  FROM joined\n)\nSELECT time, disk || ' \u2014 write' AS metric, ms AS value FROM deltas WHERE ms IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH lat AS (\n  SELECT time, disk, counter AS lat_c FROM windows_physical_disk_read_write_latency_seconds_total WHERE $__timeFilter(time) AND disk IN ($disk)\n), rw AS (\n  SELECT r.time, r.disk, r.counter + w.counter AS io_c\n  FROM windows_physical_disk_reads_total r\n  JOIN windows_physical_disk_writes_total w ON r.time = w.time AND r.disk = w.disk\n  WHERE $__timeFilter(r.time) AND r.disk IN ($disk)\n), joined AS (\n  SELECT lat.time, lat.disk, lat_c, io_c FROM lat JOIN rw ON lat.time = rw.time AND lat.disk = rw.disk\n), deltas AS (\n  SELECT time, disk,\n    (lat_c - lag(lat_c) OVER (PARTITION BY disk ORDER BY time)) / NULLIF(io_c - lag(io_c) OVER (PARTITION BY disk ORDER BY time), 0) * 1000 AS ms\n  FROM joined\n)\nSELECT time, disk || ' \u2014 combined' AS metric, ms AS value FROM deltas WHERE ms IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Physical Disk Avg Latency (Read/Write/Combined)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "short"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 198
+      },
+      "id": 70,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, disk,\n    (counter - lag(counter) OVER (PARTITION BY disk ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (PARTITION BY disk ORDER BY time))) AS rate\n  FROM windows_physical_disk_split_ios_total\n  WHERE $__timeFilter(time) AND disk IN ($disk)\n)\nSELECT time, disk AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, disk AS metric, gauge AS value\nFROM windows_physical_disk_requests_queued\nWHERE $__timeFilter(time) AND disk IN ($disk)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Physical Disk Split I/Os & Queue Length",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 206
+      },
+      "id": 71,
+      "panels": [],
+      "title": "Disk: Drive Health",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Size"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 207
+      },
+      "id": 72,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH info AS (\n  SELECT DISTINCT ON (name) name, model, caption FROM windows_diskdrive_info ORDER BY name, time DESC\n), size AS (\n  SELECT DISTINCT ON (name) name, gauge AS size_bytes FROM windows_diskdrive_size ORDER BY name, time DESC\n), parts AS (\n  SELECT DISTINCT ON (name) name, gauge AS partitions FROM windows_diskdrive_partitions ORDER BY name, time DESC\n)\nSELECT i.name AS \"Name\", i.model AS \"Model\", i.caption AS \"Caption\", s.size_bytes AS \"Size\", p.partitions AS \"Partitions\"\nFROM info i JOIN size s USING (name) JOIN parts p USING (name)\nORDER BY i.name",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Physical Drive Identity & Capacity",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "fillOpacity": 70,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "True": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "True"
+                },
+                "False": {
+                  "color": "red",
+                  "index": 1,
+                  "text": "False"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 215
+      },
+      "id": 73,
+      "options": {
+        "alignValue": "center",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, name || ' \u2014 ' || status AS metric, 'True' AS value\nFROM windows_diskdrive_status\nWHERE gauge = 1 AND $__timeFilter(time)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Drive Status",
+      "type": "state-timeline"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "fillOpacity": 70,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "True": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "True"
+                },
+                "False": {
+                  "color": "red",
+                  "index": 1,
+                  "text": "False"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 223
+      },
+      "id": 74,
+      "options": {
+        "alignValue": "center",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, name || ' \u2014 ' || availability AS metric, 'True' AS value\nFROM windows_diskdrive_availability\nWHERE gauge = 1 AND $__timeFilter(time)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Drive Availability",
+      "type": "state-timeline"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 231
+      },
+      "id": 75,
+      "panels": [],
+      "title": "Network: Traffic & Errors",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 232
+      },
+      "id": 76,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, nic,\n    (counter - lag(counter) OVER (PARTITION BY nic ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (PARTITION BY nic ORDER BY time))) AS rate\n  FROM windows_net_bytes_received_total\n  WHERE $__timeFilter(time) AND nic IN ($nic)\n)\nSELECT time, nic || ' \u2014 rx' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, nic,\n    (counter - lag(counter) OVER (PARTITION BY nic ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (PARTITION BY nic ORDER BY time))) AS rate\n  FROM windows_net_bytes_sent_total\n  WHERE $__timeFilter(time) AND nic IN ($nic)\n)\nSELECT time, nic || ' \u2014 tx' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Network Throughput (RX/TX)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "pps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 232
+      },
+      "id": 77,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, nic,\n    (counter - lag(counter) OVER (PARTITION BY nic ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (PARTITION BY nic ORDER BY time))) AS rate\n  FROM windows_net_packets_received_total\n  WHERE $__timeFilter(time) AND nic IN ($nic)\n)\nSELECT time, nic || ' \u2014 rx' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, nic,\n    (counter - lag(counter) OVER (PARTITION BY nic ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (PARTITION BY nic ORDER BY time))) AS rate\n  FROM windows_net_packets_sent_total\n  WHERE $__timeFilter(time) AND nic IN ($nic)\n)\nSELECT time, nic || ' \u2014 tx' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Network Packets (RX/TX)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 232
+      },
+      "id": 78,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, nic,\n    (counter - lag(counter) OVER (PARTITION BY nic ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (PARTITION BY nic ORDER BY time))) AS rate\n  FROM windows_net_packets_outbound_discarded_total\n  WHERE $__timeFilter(time) AND nic IN ($nic)\n)\nSELECT time, nic || ' \u2014 outbound discarded' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, nic,\n    (counter - lag(counter) OVER (PARTITION BY nic ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (PARTITION BY nic ORDER BY time))) AS rate\n  FROM windows_net_packets_outbound_errors_total\n  WHERE $__timeFilter(time) AND nic IN ($nic)\n)\nSELECT time, nic || ' \u2014 outbound errors' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, nic,\n    (counter - lag(counter) OVER (PARTITION BY nic ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (PARTITION BY nic ORDER BY time))) AS rate\n  FROM windows_net_packets_received_discarded_total\n  WHERE $__timeFilter(time) AND nic IN ($nic)\n)\nSELECT time, nic || ' \u2014 rx discarded' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, nic,\n    (counter - lag(counter) OVER (PARTITION BY nic ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (PARTITION BY nic ORDER BY time))) AS rate\n  FROM windows_net_packets_received_errors_total\n  WHERE $__timeFilter(time) AND nic IN ($nic)\n)\nSELECT time, nic || ' \u2014 rx errors' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "D",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, nic,\n    (counter - lag(counter) OVER (PARTITION BY nic ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (PARTITION BY nic ORDER BY time))) AS rate\n  FROM windows_net_packets_received_unknown_total\n  WHERE $__timeFilter(time) AND nic IN ($nic)\n)\nSELECT time, nic || ' \u2014 rx unknown' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "E",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Network Errors & Discards",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "Bps"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "short"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 240
+      },
+      "id": 79,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, nic AS metric, gauge AS value\nFROM windows_net_current_bandwidth_bytes\nWHERE $__timeFilter(time) AND nic IN ($nic)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, nic AS metric, gauge AS value\nFROM windows_net_output_queue_length_packets\nWHERE $__timeFilter(time) AND nic IN ($nic)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Current Bandwidth (Link Speed) & Output Queue Length",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 248
+      },
+      "id": 80,
+      "panels": [],
+      "title": "Network: Interfaces & Identity",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 249
+      },
+      "id": 81,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT DISTINCT ON (nic) nic AS \"NIC\", friendly_name AS \"Friendly Name\", mac AS \"MAC\"\nFROM windows_net_nic_info\nWHERE nic IN ($nic)\nORDER BY nic, time DESC",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "NIC Identity",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 249
+      },
+      "id": 82,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT DISTINCT ON (nic, family, address) nic AS \"NIC\", family AS \"Family\", address AS \"Address\"\nFROM windows_net_nic_address_info\nWHERE nic IN ($nic)\nORDER BY nic, family, address, time DESC",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "NIC IP Addresses",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "fillOpacity": 70,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "True": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "True"
+                },
+                "False": {
+                  "color": "red",
+                  "index": 1,
+                  "text": "False"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 257
+      },
+      "id": 83,
+      "options": {
+        "alignValue": "center",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, nic || ' \u2014 ' || status AS metric, 'True' AS value\nFROM windows_net_nic_operation_status\nWHERE gauge = 1 AND $__timeFilter(time) AND nic IN ($nic)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "NIC Operation Status",
+      "type": "state-timeline"
     }
   ],
   "preload": false,
@@ -4238,7 +6682,59 @@
     "gpu"
   ],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {},
+        "datasource": {
+          "type": "postgres",
+          "uid": "postgres-telegraf"
+        },
+        "definition": "SELECT DISTINCT volume AS __text, volume AS __value FROM windows_logical_disk_free_bytes WHERE volume IS NOT NULL ORDER BY 1",
+        "includeAll": true,
+        "label": "Volume",
+        "multi": true,
+        "name": "volume",
+        "options": [],
+        "query": "SELECT DISTINCT volume AS __text, volume AS __value FROM windows_logical_disk_free_bytes WHERE volume IS NOT NULL ORDER BY 1",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "postgres",
+          "uid": "postgres-telegraf"
+        },
+        "definition": "SELECT DISTINCT disk AS __text, disk AS __value FROM windows_physical_disk_reads_total WHERE disk IS NOT NULL ORDER BY 1",
+        "includeAll": true,
+        "label": "Disk",
+        "multi": true,
+        "name": "disk",
+        "options": [],
+        "query": "SELECT DISTINCT disk AS __text, disk AS __value FROM windows_physical_disk_reads_total WHERE disk IS NOT NULL ORDER BY 1",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "postgres",
+          "uid": "postgres-telegraf"
+        },
+        "definition": "SELECT DISTINCT nic AS __text, nic AS __value FROM windows_net_bytes_received_total WHERE nic IS NOT NULL ORDER BY 1",
+        "includeAll": true,
+        "label": "NIC",
+        "multi": true,
+        "name": "nic",
+        "options": [],
+        "query": "SELECT DISTINCT nic AS __text, nic AS __value FROM windows_net_bytes_received_total WHERE nic IS NOT NULL ORDER BY 1",
+        "refresh": 2,
+        "regex": "",
+        "type": "query"
+      }
+    ]
   },
   "time": {
     "from": "now-6h",
