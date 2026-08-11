@@ -35,3 +35,10 @@ configMapGenerator:
       disableNameSuffixHash: true
       labels:
         grafana_dashboard: "1"
+  - name: grafana-dashboard-gaming-desktop
+    files:
+      - ./dashboards/gaming-desktop.json
+    options:
+      disableNameSuffixHash: true
+      labels:
+        grafana_dashboard: "1"

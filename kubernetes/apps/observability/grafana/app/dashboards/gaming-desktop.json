@@ -1,0 +1,4253 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "panels": [],
+      "title": "GPU: Utilization & Engines",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, 'GPU' AS metric, gauge*100 AS value FROM nvidia_smi_utilization_gpu_ratio WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Memory' AS metric, gauge*100 AS value FROM nvidia_smi_utilization_memory_ratio WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Decoder' AS metric, gauge*100 AS value FROM nvidia_smi_utilization_decoder_ratio WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Encoder' AS metric, gauge*100 AS value FROM nvidia_smi_utilization_encoder_ratio WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "D",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'JPEG' AS metric, gauge*100 AS value FROM nvidia_smi_utilization_jpeg_ratio WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "E",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'OFA' AS metric, gauge*100 AS value FROM nvidia_smi_utilization_ofa_ratio WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "F",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "GPU/Engine Utilization Ratios (%)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 9
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, process_id, eng, engtype,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS rate\n  FROM windows_gpu_engine_time_seconds\n  WHERE $__timeFilter(time)\n  WINDOW w AS (PARTITION BY process_id, eng, engtype ORDER BY time)\n)\nSELECT time, engtype AS metric, sum(rate)*100 AS value\nFROM deltas WHERE rate IS NOT NULL GROUP BY time, engtype ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "GPU Engine Time by Type (%, all processes)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 9
+      },
+      "id": 4,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH per_eng AS (\n  SELECT process_id, eng, engtype,\n    max(counter) - min(counter) AS busy_seconds,\n    extract(epoch FROM (max(time) - min(time))) AS wall_seconds,\n    count(*) AS n\n  FROM windows_gpu_engine_time_seconds\n  WHERE time > now() - interval '5 minutes'\n  GROUP BY process_id, eng, engtype\n  HAVING count(*) > 1\n), windowed AS (\n  SELECT process_id, engtype,\n    sum(busy_seconds) AS busy_seconds,\n    max(wall_seconds) AS wall_seconds\n  FROM per_eng\n  GROUP BY process_id, engtype\n)\nSELECT\n  process_id AS \"PID\",\n  engtype AS \"Engine\",\n  round(((busy_seconds / NULLIF(wall_seconds, 0)) * 100)::numeric, 1) AS \"Busy %\"\nFROM windowed\nWHERE (busy_seconds / NULLIF(wall_seconds, 0)) > 0.01\nORDER BY \"Busy %\" DESC\nLIMIT 15",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Top GPU Processes by Engine Busy % (5m)",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 17
+      },
+      "id": 5,
+      "panels": [],
+      "title": "GPU: VRAM",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 18
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, 'Used' AS metric, gauge AS value FROM nvidia_smi_memory_used_bytes WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Free' AS metric, gauge AS value FROM nvidia_smi_memory_free_bytes WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Reserved' AS metric, gauge AS value FROM nvidia_smi_memory_reserved_bytes WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Total' AS metric, gauge AS value FROM nvidia_smi_memory_total_bytes WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "D",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "GPU VRAM (Used/Free/Reserved/Total)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 18
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, 'Committed' AS metric, gauge AS value FROM windows_gpu_adapter_memory_committed_bytes WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Dedicated' AS metric, gauge AS value FROM windows_gpu_adapter_memory_dedicated_bytes WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Shared' AS metric, gauge AS value FROM windows_gpu_adapter_memory_shared_bytes WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Windows GPU Adapter Memory",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 0,
+        "y": 26
+      },
+      "id": 8,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT gauge AS \"Dedicated Video Memory Size\" FROM windows_gpu_dedicated_video_memory_size_bytes ORDER BY time DESC LIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Dedicated Video Memory Size",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 8,
+        "y": 26
+      },
+      "id": 9,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT gauge AS \"Dedicated System Memory Size\" FROM windows_gpu_dedicated_system_memory_size_bytes ORDER BY time DESC LIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Dedicated System Memory Size",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 16,
+        "y": 26
+      },
+      "id": 10,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT gauge AS \"Shared System Memory Size\" FROM windows_gpu_shared_system_memory_size_bytes ORDER BY time DESC LIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Shared System Memory Size",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Dedicated"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Shared"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Local"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Non-Local"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Committed"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 30
+      },
+      "id": 11,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH dedicated AS (\n  SELECT DISTINCT ON (process_id) process_id, gauge AS dedicated_bytes\n  FROM windows_gpu_process_memory_dedicated_bytes\n  ORDER BY process_id, time DESC\n), shared AS (\n  SELECT DISTINCT ON (process_id) process_id, gauge AS shared_bytes\n  FROM windows_gpu_process_memory_shared_bytes\n  ORDER BY process_id, time DESC\n), local AS (\n  SELECT DISTINCT ON (process_id) process_id, gauge AS local_bytes\n  FROM windows_gpu_process_memory_local_bytes\n  ORDER BY process_id, time DESC\n), non_local AS (\n  SELECT DISTINCT ON (process_id) process_id, gauge AS non_local_bytes\n  FROM windows_gpu_process_memory_non_local_bytes\n  ORDER BY process_id, time DESC\n), committed AS (\n  SELECT DISTINCT ON (process_id) process_id, gauge AS committed_bytes\n  FROM windows_gpu_process_memory_committed_bytes\n  ORDER BY process_id, time DESC\n)\nSELECT\n  d.process_id AS \"PID\",\n  d.dedicated_bytes AS \"Dedicated\",\n  s.shared_bytes AS \"Shared\",\n  l.local_bytes AS \"Local\",\n  n.non_local_bytes AS \"Non-Local\",\n  c.committed_bytes AS \"Committed\"\nFROM dedicated d\nLEFT JOIN shared s ON s.process_id = d.process_id\nLEFT JOIN local l ON l.process_id = d.process_id\nLEFT JOIN non_local n ON n.process_id = d.process_id\nLEFT JOIN committed c ON c.process_id = d.process_id\nORDER BY d.dedicated_bytes DESC\nLIMIT 15",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Top GPU Processes by VRAM Usage",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 38
+      },
+      "id": 12,
+      "panels": [],
+      "title": "GPU: Thermal, Power & Clocks",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "celsius"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 39
+      },
+      "id": 13,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, 'Temperature' AS metric, gauge AS value FROM nvidia_smi_temperature_gpu WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'T-Limit' AS metric, gauge AS value FROM nvidia_smi_temperature_gpu_tlimit WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "GPU Temperature",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 39
+      },
+      "id": 14,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, 'Draw' AS metric, gauge AS value FROM nvidia_smi_power_draw_watts WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Draw (Instant)' AS metric, gauge AS value FROM nvidia_smi_power_draw_instant_watts WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Limit' AS metric, gauge AS value FROM nvidia_smi_power_limit_watts WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Enforced Limit' AS metric, gauge AS value FROM nvidia_smi_enforced_power_limit_watts WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "D",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "GPU Power Draw",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 39
+      },
+      "id": 15,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, 'Fan Speed' AS metric, gauge*100 AS value FROM nvidia_smi_fan_speed_ratio WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Fan Speed",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "MHz",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 47
+      },
+      "id": 16,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, 'Graphics' AS metric, gauge/1000000.0 AS value FROM nvidia_smi_clocks_current_graphics_clock_hz WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Memory' AS metric, gauge/1000000.0 AS value FROM nvidia_smi_clocks_current_memory_clock_hz WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'SM' AS metric, gauge/1000000.0 AS value FROM nvidia_smi_clocks_current_sm_clock_hz WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Video' AS metric, gauge/1000000.0 AS value FROM nvidia_smi_clocks_current_video_clock_hz WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "D",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "GPU Clocks (Current, MHz)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 47
+      },
+      "id": 17,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH current AS (\n  (SELECT 'Graphics' AS clock, gauge/1000000.0 AS current_mhz FROM nvidia_smi_clocks_current_graphics_clock_hz ORDER BY time DESC LIMIT 1)\n  UNION ALL\n  (SELECT 'Memory', gauge/1000000.0 FROM nvidia_smi_clocks_current_memory_clock_hz ORDER BY time DESC LIMIT 1)\n  UNION ALL\n  (SELECT 'SM', gauge/1000000.0 FROM nvidia_smi_clocks_current_sm_clock_hz ORDER BY time DESC LIMIT 1)\n  UNION ALL\n  (SELECT 'Video', gauge/1000000.0 FROM nvidia_smi_clocks_current_video_clock_hz ORDER BY time DESC LIMIT 1)\n), max AS (\n  (SELECT 'Graphics' AS clock, gauge/1000000.0 AS max_mhz FROM nvidia_smi_clocks_max_graphics_clock_hz ORDER BY time DESC LIMIT 1)\n  UNION ALL\n  (SELECT 'Memory', gauge/1000000.0 FROM nvidia_smi_clocks_max_memory_clock_hz ORDER BY time DESC LIMIT 1)\n  UNION ALL\n  (SELECT 'SM', gauge/1000000.0 FROM nvidia_smi_clocks_max_sm_clock_hz ORDER BY time DESC LIMIT 1)\n)\nSELECT c.clock AS \"Clock\", c.current_mhz AS \"Current (MHz)\", m.max_mhz AS \"Max (MHz)\"\nFROM current c\nLEFT JOIN max m ON m.clock = c.clock\nORDER BY \"Clock\"",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "GPU Clocks (Current vs Max, MHz)",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 55
+      },
+      "id": 18,
+      "panels": [],
+      "title": "GPU: Throttle Reasons & PCIe",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "fillOpacity": 70,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "True": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "True"
+                },
+                "False": {
+                  "color": "red",
+                  "index": 1,
+                  "text": "False"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 56
+      },
+      "id": 19,
+      "options": {
+        "alignValue": "center",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, 'Applications Clocks Setting' AS metric, 'True' AS value FROM nvidia_smi_clocks_event_reasons_applications_clocks_setting WHERE gauge = 1 AND $__timeFilter(time)\nUNION ALL\nSELECT time, 'GPU Idle' AS metric, 'True' AS value FROM nvidia_smi_clocks_event_reasons_gpu_idle WHERE gauge = 1 AND $__timeFilter(time)\nUNION ALL\nSELECT time, 'HW Power Brake Slowdown' AS metric, 'True' AS value FROM nvidia_smi_clocks_event_reasons_hw_power_brake_slowdown WHERE gauge = 1 AND $__timeFilter(time)\nUNION ALL\nSELECT time, 'HW Slowdown' AS metric, 'True' AS value FROM nvidia_smi_clocks_event_reasons_hw_slowdown WHERE gauge = 1 AND $__timeFilter(time)\nUNION ALL\nSELECT time, 'HW Thermal Slowdown' AS metric, 'True' AS value FROM nvidia_smi_clocks_event_reasons_hw_thermal_slowdown WHERE gauge = 1 AND $__timeFilter(time)\nUNION ALL\nSELECT time, 'SW Power Cap' AS metric, 'True' AS value FROM nvidia_smi_clocks_event_reasons_sw_power_cap WHERE gauge = 1 AND $__timeFilter(time)\nUNION ALL\nSELECT time, 'SW Thermal Slowdown' AS metric, 'True' AS value FROM nvidia_smi_clocks_event_reasons_sw_thermal_slowdown WHERE gauge = 1 AND $__timeFilter(time)\nUNION ALL\nSELECT time, 'Sync Boost' AS metric, 'True' AS value FROM nvidia_smi_clocks_event_reasons_sync_boost WHERE gauge = 1 AND $__timeFilter(time)\nORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Clock Throttle Reasons",
+      "type": "state-timeline"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 18,
+        "x": 0,
+        "y": 64
+      },
+      "id": 20,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT\n  (SELECT gauge FROM nvidia_smi_pcie_link_gen_current ORDER BY time DESC LIMIT 1) AS \"Gen (Current)\",\n  (SELECT gauge FROM nvidia_smi_pcie_link_gen_max ORDER BY time DESC LIMIT 1) AS \"Gen (Max)\",\n  (SELECT gauge FROM nvidia_smi_pcie_link_width_current ORDER BY time DESC LIMIT 1) AS \"Width (Current)\",\n  (SELECT gauge FROM nvidia_smi_pcie_link_width_max ORDER BY time DESC LIMIT 1) AS \"Width (Max)\"",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "PCIe Link Gen/Width (Current vs Max)",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 64
+      },
+      "id": 21,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT 'P' || gauge::int AS \"P-State\" FROM nvidia_smi_pstate ORDER BY time DESC LIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "P-State",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 72
+      },
+      "id": 22,
+      "panels": [],
+      "title": "GPU: Encode & Identity",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "\u00b5s"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 73
+      },
+      "id": 23,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, 'Average FPS' AS metric, gauge AS value FROM nvidia_smi_encoder_stats_average_fps WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Average Latency' AS metric, gauge AS value FROM nvidia_smi_encoder_stats_average_latency WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Session Count' AS metric, gauge AS value FROM nvidia_smi_encoder_stats_session_count WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "NVENC Encoder Stats",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 81
+      },
+      "id": 24,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT name AS \"GPU Name (NVML)\" FROM nvidia_smi_gpu_info ORDER BY time DESC LIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "GPU Name (NVML)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 81
+      },
+      "id": 25,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT name AS \"GPU Name (Windows)\" FROM windows_gpu_info ORDER BY time DESC LIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "GPU Name (Windows)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 81
+      },
+      "id": 26,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT driver_version AS \"Driver Version\" FROM nvidia_smi_gpu_info ORDER BY time DESC LIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Driver Version",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 81
+      },
+      "id": 27,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT compute_cap AS \"Compute Capability\" FROM nvidia_smi_gpu_info ORDER BY time DESC LIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Compute Capability",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 81
+      },
+      "id": 28,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT gauge AS \"InfoROM OEM Version\" FROM nvidia_smi_inforom_oem ORDER BY time DESC LIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "InfoROM OEM Version",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 81
+      },
+      "id": 29,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT serial AS \"Serial\" FROM nvidia_smi_gpu_info ORDER BY time DESC LIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Serial",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 85
+      },
+      "id": 30,
+      "panels": [],
+      "title": "CPU: Utilization",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 86
+      },
+      "id": 31,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, core, mode,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS rate\n  FROM windows_cpu_time_total\n  WHERE $__timeFilter(time)\n  WINDOW w AS (PARTITION BY core, mode ORDER BY time)\n)\nSELECT time, mode AS metric, avg(rate) * 100 AS value\nFROM deltas WHERE rate IS NOT NULL GROUP BY time, mode ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "CPU Utilization by Mode (avg, stacked)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 86
+      },
+      "id": 32,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, core,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS idle_rate\n  FROM windows_cpu_time_total\n  WHERE mode = 'idle' AND $__timeFilter(time)\n  WINDOW w AS (PARTITION BY core ORDER BY time)\n)\nSELECT time, core AS metric, (1 - idle_rate) * 100 AS value\nFROM deltas WHERE idle_rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Per-Core Busy %",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 86
+      },
+      "id": 33,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, core,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS rate\n  FROM windows_cpu_processor_utility_total\n  WHERE $__timeFilter(time)\n  WINDOW w AS (PARTITION BY core ORDER BY time)\n)\nSELECT time, 'Utility' AS metric, avg(rate) * 100 AS value\nFROM deltas WHERE rate IS NOT NULL GROUP BY time ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, core,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS rate\n  FROM windows_cpu_processor_performance_total\n  WHERE $__timeFilter(time)\n  WINDOW w AS (PARTITION BY core ORDER BY time)\n)\nSELECT time, 'Performance' AS metric, avg(rate) * 100 AS value\nFROM deltas WHERE rate IS NOT NULL GROUP BY time ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Effective/Frequency-Scaled Utilization (avg)",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 94
+      },
+      "id": 34,
+      "panels": [],
+      "title": "CPU: Frequency & Power States",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "MHz",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 95
+      },
+      "id": 35,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, core AS metric, gauge AS value FROM windows_cpu_core_frequency_mhz WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Per-Core Frequency (MHz)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 95
+      },
+      "id": 36,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, core, state,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS rate\n  FROM windows_cpu_cstate_seconds_total\n  WHERE $__timeFilter(time)\n  WINDOW w AS (PARTITION BY core, state ORDER BY time)\n)\nSELECT time, state AS metric, avg(rate) * 100 AS value\nFROM deltas WHERE rate IS NOT NULL GROUP BY time, state ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "C-State Residency % (avg across cores)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "fillOpacity": 70,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "Parked": {
+                  "color": "blue",
+                  "index": 0,
+                  "text": "Parked"
+                },
+                "Active": {
+                  "color": "green",
+                  "index": 1,
+                  "text": "Active"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 103
+      },
+      "id": 37,
+      "options": {
+        "alignValue": "center",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, core AS metric, CASE WHEN gauge = 1 THEN 'Parked' ELSE 'Active' END AS value FROM windows_cpu_parking_status WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Core Parking Status",
+      "type": "state-timeline"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 111
+      },
+      "id": 38,
+      "panels": [],
+      "title": "CPU: Interrupts & Raw Counters",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 112
+      },
+      "id": 39,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, core,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS rate\n  FROM windows_cpu_interrupts_total\n  WHERE $__timeFilter(time)\n  WINDOW w AS (PARTITION BY core ORDER BY time)\n)\nSELECT time, 'Interrupts' AS metric, sum(rate) AS value\nFROM deltas WHERE rate IS NOT NULL GROUP BY time ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, core,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS rate\n  FROM windows_cpu_dpcs_total\n  WHERE $__timeFilter(time)\n  WINDOW w AS (PARTITION BY core ORDER BY time)\n)\nSELECT time, 'DPCs' AS metric, sum(rate) AS value\nFROM deltas WHERE rate IS NOT NULL GROUP BY time ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Interrupts & DPCs (per sec, system total)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 112
+      },
+      "id": 40,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, core,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS rate\n  FROM windows_cpu_clock_interrupts_total\n  WHERE $__timeFilter(time)\n  WINDOW w AS (PARTITION BY core ORDER BY time)\n)\nSELECT time, 'Clock Interrupts' AS metric, sum(rate) AS value\nFROM deltas WHERE rate IS NOT NULL GROUP BY time ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time, core,\n    (counter - lag(counter) OVER w) / extract(epoch FROM (time - lag(time) OVER w)) AS rate\n  FROM windows_cpu_idle_break_events_total\n  WHERE $__timeFilter(time)\n  WINDOW w AS (PARTITION BY core ORDER BY time)\n)\nSELECT time, 'Idle Break Events' AS metric, sum(rate) AS value\nFROM deltas WHERE rate IS NOT NULL GROUP BY time ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Clock Interrupts & Idle Break Events (per sec)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 120
+      },
+      "id": 41,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT gauge AS \"Logical Processors\" FROM windows_cpu_logical_processor ORDER BY time DESC LIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Logical Processors",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 124
+      },
+      "id": 42,
+      "panels": [],
+      "title": "Memory: Overview",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 125
+      },
+      "id": 43,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT gauge AS \"Physical Total\" FROM windows_memory_physical_total_bytes ORDER BY time DESC LIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Physical Total",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 125
+      },
+      "id": 44,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT gauge AS \"Physical Free\" FROM windows_memory_physical_free_bytes ORDER BY time DESC LIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Physical Free",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 125
+      },
+      "id": 45,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT gauge AS \"Available\" FROM windows_memory_available_bytes ORDER BY time DESC LIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Available",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 125
+      },
+      "id": 46,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT gauge AS \"Committed\" FROM windows_memory_committed_bytes ORDER BY time DESC LIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT gauge AS \"Limit\" FROM windows_memory_commit_limit ORDER BY time DESC LIMIT 1",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Committed vs Limit",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 129
+      },
+      "id": 47,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, 'Physical Free' AS metric, gauge AS value FROM windows_memory_physical_free_bytes WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Physical Total' AS metric, gauge AS value FROM windows_memory_physical_total_bytes WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Available' AS metric, gauge AS value FROM windows_memory_available_bytes WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Committed' AS metric, gauge AS value FROM windows_memory_committed_bytes WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "D",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Commit Limit' AS metric, gauge AS value FROM windows_memory_commit_limit WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "E",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Memory Usage Over Time",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 137
+      },
+      "id": 48,
+      "panels": [],
+      "title": "Memory: Cache & Standby Lists",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 138
+      },
+      "id": 49,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, 'Cache' AS metric, gauge AS value FROM windows_memory_cache_bytes WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Cache (Peak)' AS metric, gauge AS value FROM windows_memory_cache_bytes_peak WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Cache Bytes (Current vs Peak)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 138
+      },
+      "id": 50,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "SELECT time, 'Standby Cache (Core)' AS metric, gauge AS value FROM windows_memory_standby_cache_core_bytes WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Standby Cache (Normal Priority)' AS metric, gauge AS value FROM windows_memory_standby_cache_normal_priority_bytes WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Standby Cache (Reserve)' AS metric, gauge AS value FROM windows_memory_standby_cache_reserve_bytes WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Free & Zero Page List' AS metric, gauge AS value FROM windows_memory_free_and_zero_page_list_bytes WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "D",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "SELECT time, 'Modified Page List' AS metric, gauge AS value FROM windows_memory_modified_page_list_bytes WHERE $__timeFilter(time) ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "E",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Standby & Free Page Lists",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 146
+      },
+      "id": 51,
+      "panels": [],
+      "title": "Memory: Paging & Pagefile",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 147
+      },
+      "id": 52,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time,\n    (counter - lag(counter) OVER (ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (ORDER BY time))) AS rate\n  FROM windows_memory_page_faults_total\n  WHERE $__timeFilter(time)\n)\nSELECT time, 'Page Faults' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time,\n    (counter - lag(counter) OVER (ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (ORDER BY time))) AS rate\n  FROM windows_memory_demand_zero_faults_total\n  WHERE $__timeFilter(time)\n)\nSELECT time, 'Demand Zero Faults' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time,\n    (counter - lag(counter) OVER (ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (ORDER BY time))) AS rate\n  FROM windows_memory_transition_faults_total\n  WHERE $__timeFilter(time)\n)\nSELECT time, 'Transition Faults' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time,\n    (counter - lag(counter) OVER (ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (ORDER BY time))) AS rate\n  FROM windows_memory_cache_faults_total\n  WHERE $__timeFilter(time)\n)\nSELECT time, 'Cache Faults' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "D",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Page Faults (per second)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 147
+      },
+      "id": 53,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time,\n    (counter - lag(counter) OVER (ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (ORDER BY time))) AS rate\n  FROM windows_memory_transition_pages_repurposed_total\n  WHERE $__timeFilter(time)\n)\nSELECT time, 'Transition Pages Repurposed' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time,\n    (counter - lag(counter) OVER (ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (ORDER BY time))) AS rate\n  FROM windows_memory_write_copies_total\n  WHERE $__timeFilter(time)\n)\nSELECT time, 'Write Copies' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Transition Pages & Write Copies (per sec)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres-telegraf"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 147
+      },
+      "id": 54,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time,\n    (counter - lag(counter) OVER (ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (ORDER BY time))) AS rate\n  FROM windows_memory_swap_page_operations_total\n  WHERE $__timeFilter(time)\n)\nSELECT time, 'Swap Page Operations' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time,\n    (counter - lag(counter) OVER (ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (ORDER BY time))) AS rate\n  FROM windows_memory_swap_page_reads_total\n  WHERE $__timeFilter(time)\n)\nSELECT time, 'Swap Page Reads' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "B",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time,\n    (counter - lag(counter) OVER (ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (ORDER BY time))) AS rate\n  FROM windows_memory_swap_page_writes_total\n  WHERE $__timeFilter(time)\n)\nSELECT time, 'Swap Page Writes' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "C",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time,\n    (counter - lag(counter) OVER (ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (ORDER BY time))) AS rate\n  FROM windows_memory_swap_pages_read_total\n  WHERE $__timeFilter(time)\n)\nSELECT time, 'Swap Pages Read' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "D",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        },
+        {
+          "rawSql": "WITH deltas AS (\n  SELECT time,\n    (counter - lag(counter) OVER (ORDER BY time)) / extract(epoch FROM (time - lag(time) OVER (ORDER BY time))) AS rate\n  FROM windows_memory_swap_pages_written_total\n  WHERE $__timeFilter(time)\n)\nSELECT time, 'Swap Pages Written' AS metric, rate AS value FROM deltas WHERE rate IS NOT NULL ORDER BY time",
+          "format": "time_series",
+          "rawQuery": true,
+          "refId": "E",
+          "datasource": {
+            "type": "postgres",
+            "uid": "postgres-telegraf"
+          }
+        }
+      ],
+      "title": "Swap Page Operations (per second)",
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 42,
+  "tags": [
+    "windows",
+    "desktop",
+    "gpu"
+  ],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Gaming Desktop",
+  "uid": "gaming-desktop",
+  "version": 1,
+  "weekStart": ""
+}
