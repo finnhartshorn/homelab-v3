@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: piper
-          image: rhasspy/wyoming-piper:2.3.1
+          image: rhasspy/wyoming-piper:2.4.2
           args:
             - --voice
             - en_GB-jenny_dioco-medium
