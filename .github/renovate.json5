@@ -93,7 +93,6 @@
         'docker.io/cloudflare/cloudflared',
         'code.forgejo.org/forgejo-helm/forgejo',
         'app**template',
-        'home-assistant',
         'home-assistant-matter-server',
         'grafana',
         'uv',
