@@ -614,5 +614,26 @@
       datasourceTemplate: 'docker',
       depNameTemplate: 'ghcr.io/siderolabs/installer',
     },
+    {
+      customType: 'regex',
+      description: [
+        'CNPG Cluster CRD uses a non-standard "imageName" field for the',
+        'postgres image, which the default docker manager does not',
+        'recognize (it only matches "image:"). Without this, the Cluster',
+        'silently drifts out of sync with the postgres image tag used by',
+        'the logical-backup and hypertable-maintenance CronJobs in the',
+        'same directory, which the default manager does pick up - see',
+        'the postgres 18.4/18.6 incident. Same depName as those CronJobs',
+        'so Renovate groups all three into one PR.',
+      ],
+      managerFilePatterns: [
+        '/(^|/)kubernetes/apps/database/postgres/cluster/cluster\\.ya?ml$/',
+      ],
+      matchStrings: [
+        'imageName:\\s*ghcr\\.io/cloudnative-pg/postgresql:(?<currentValue>\\S+)',
+      ],
+      datasourceTemplate: 'docker',
+      depNameTemplate: 'ghcr.io/cloudnative-pg/postgresql',
+    },
   ],
 }
