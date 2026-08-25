@@ -29,6 +29,26 @@ with the prefix as a *literal outside* the capture group (see the
 `.github/renovate.json5` for the pattern), instead of relying on the
 generic depName-comment manager.
 
+## Renovate: non-standard field names are silently skipped
+
+The default docker manager only matches an `image:` field. Any CRD or
+manifest that stores an image under a differently-named field (e.g. CNPG's
+`Cluster` resource uses `imageName:`, not `image:`) is invisible to
+Renovate by default — it gets no PRs at all, with no error or warning.
+
+This bit us with `kubernetes/apps/database/postgres/cluster/cluster.yaml`:
+the `hypertable-maintenance-cronjob.yaml` and `logical-backup-cronjob.yaml`
+in the same directory reference the same `ghcr.io/cloudnative-pg/postgresql`
+image via `image:` and got bumped 18.4 → 18.6 automatically, while the
+actual `Cluster.spec.imageName` sat untouched on 18.4 — silent version
+drift between the running database and its own sidecar tooling.
+
+**When adding a new manifest that pins an image via a non-`image:` field**,
+add a dedicated `customManagers` regex entry for it (same `depNameTemplate`
+as any sibling files referencing the same image, so Renovate groups them
+into one PR — see the `cluster.yaml` manager in `.github/renovate.json5`
+for the pattern) instead of assuming the default manager will find it.
+
 ## Talos: ALWAYS `--dry-run` before applying machine config
 
 **Never run `talosctl apply-config` for real on a node before first running
