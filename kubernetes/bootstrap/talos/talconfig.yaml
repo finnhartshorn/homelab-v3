@@ -3,7 +3,7 @@
 # Kept in lockstep with talosupgrade.yaml via a dedicated renovate manager
 # (see .github/renovate.json5) - talhelper requires the "v" prefix, which
 # the generic depName-comment convention used elsewhere would strip.
-talosVersion: v1.13.9
+talosVersion: v1.13.10
 # renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
 kubernetesVersion: 1.37.0
 
