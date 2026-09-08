@@ -119,6 +119,7 @@
         '/spegel/',
         'code.forgejo.org/forgejo/runner',
         'docker.io/docker',
+        'rhasspy/wyoming-piper',
       ],
       matchUpdateTypes: [
         'minor',
