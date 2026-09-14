@@ -28,7 +28,7 @@ spec:
           app:
             image:
               repository: docker.io/library/telegraf
-              tag: "1.39"
+              tag: "1.40"
             env:
               TELEGRAF_DB_PASSWORD:
                 valueFrom:
