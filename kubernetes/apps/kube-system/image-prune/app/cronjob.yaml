@@ -28,7 +28,7 @@ spec:
                   topologyKey: kubernetes.io/hostname
           initContainers:
             - name: install-crictl
-              image: docker.io/library/alpine:3.24.1
+              image: docker.io/library/alpine:3.24.2
               imagePullPolicy: IfNotPresent
               command:
                 - sh
@@ -43,7 +43,7 @@ spec:
                   mountPath: /usr/local/bin
           containers:
             - name: image-prune
-              image: docker.io/library/alpine:3.24.1
+              image: docker.io/library/alpine:3.24.2
               imagePullPolicy: IfNotPresent
               command:
                 - sh
