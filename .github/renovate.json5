@@ -113,6 +113,7 @@
         'metrics-server',
         '/reloader/',
         'docker.io/library/telegraf',
+        'docker.io/library/alpine',
         '/flux-operator/',
         '/flux-instance/',
         'external-dns',
