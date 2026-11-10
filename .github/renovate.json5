@@ -67,6 +67,36 @@
   packageRules: [
     {
       description: [
+        'Servarr apps (sonarr/radarr/prowlarr) are tracked via github-releases',
+        '(see customManagers below) so that GitHub prereleases are ignored -',
+        'upstream publishes new majors as prereleases and the home-operations',
+        'image tags are indistinguishable from stable ones. Disable the',
+        'helm-values docker lookup for the same images to avoid duplicate PRs.',
+      ],
+      matchManagers: [
+        'helm-values',
+      ],
+      matchPackageNames: [
+        'ghcr.io/home-operations/prowlarr',
+        'ghcr.io/home-operations/sonarr',
+        'ghcr.io/home-operations/radarr',
+      ],
+      enabled: false,
+    },
+    {
+      description: [
+        'Buffer for the home-operations image to be built/pushed after the',
+        'upstream GitHub release appears',
+      ],
+      matchPackageNames: [
+        'prowlarr/prowlarr',
+        'sonarr/sonarr',
+        'radarr/radarr',
+      ],
+      minimumReleaseAge: '3 days',
+    },
+    {
+      description: [
         'Auto-merge GitHub Actions for minor and patch',
       ],
       matchManagers: [
@@ -85,9 +115,9 @@
         'Auto merge selected packages',
       ],
       matchPackageNames: [
-        'ghcr.io/home-operations/prowlarr',
-        'ghcr.io/home-operations/sonarr',
-        'ghcr.io/home-operations/radarr',
+        'prowlarr/prowlarr',
+        'sonarr/sonarr',
+        'radarr/radarr',
         'ghcr.io/flaresolverr/flaresolverr',
         'windmill',
         'docker.io/cloudflare/cloudflared',
@@ -582,6 +612,27 @@
     },
   ],
   customManagers: [
+    {
+      customType: 'regex',
+      description: [
+        'Servarr apps: track the upstream GitHub release (which carries the',
+        'prerelease flag, so ignoreUnstable skips prereleases) instead of the',
+        'ghcr.io/home-operations docker tag. Tags are plain 4-part versions',
+        'without a digest (a github-releases lookup cannot supply an image',
+        'digest) and need "loose" versioning to compare the 4th component.',
+        'GitHub tags have a "v" prefix, stripped via extractVersion.',
+      ],
+      managerFilePatterns: [
+        '/(^|/)kubernetes/apps/arr/(sonarr|radarr|prowlarr)/app/helmrelease\\.ya?ml$/',
+      ],
+      matchStrings: [
+        'repository:\\s*ghcr\\.io/home-operations/(?<app>sonarr|radarr|prowlarr)\\s*\\n\\s*tag:\\s*(?<currentValue>\\d+(\\.\\d+)+)',
+      ],
+      datasourceTemplate: 'github-releases',
+      depNameTemplate: '{{{app}}}/{{{app}}}',
+      versioningTemplate: 'loose',
+      extractVersionTemplate: '^v(?<version>.*)$',
+    },
     {
       customType: 'regex',
       description: [
