@@ -27,7 +27,7 @@ spec:
           app:
             image:
               repository: finnhartshorn/ghidra-server
-              tag: 12.1.3@sha256:9da0dc3a88b40d4389a06165e1b15672b1f961237f7a1f634ee8f68e83ead3fb
+              tag: 12.2@sha256:0465edd504219e51f4a60128128f45cbded98953d1b55dc13c65bad6fad58c39
             env:
               TZ: "Australia/Melbourne"
               # cert-manager (Let's Encrypt) keystore.jks, mounted from the ghidra-tls secret
