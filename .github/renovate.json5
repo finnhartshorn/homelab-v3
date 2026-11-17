@@ -97,6 +97,17 @@
     },
     {
       description: [
+        'Sonarr v5 is still a beta line (every v5.x GitHub release is a',
+        'prerelease), so keep Sonarr on v4 until v5 goes stable. Bump this',
+        'when moving to v5.',
+      ],
+      matchPackageNames: [
+        'sonarr/sonarr',
+      ],
+      allowedVersions: '/^4\\./',
+    },
+    {
+      description: [
         'Auto-merge GitHub Actions for minor and patch',
       ],
       matchManagers: [
