@@ -24,7 +24,7 @@ spec:
           app:
             image:
               repository: ghcr.io/home-operations/sonarr
-              tag: 4.0.20.3014
+              tag: 4.0.20.3012
             env:
               TZ: "Australia/Melbourne"
               SONARR__INSTANCE_NAME: Sonarr
@@ -48,7 +48,7 @@ spec:
       config:
         storageClass: "longhorn"
         accessMode: "ReadWriteOnce"
-        size: 1Gi
+        size: 2Gi
       tv:
         enabled: true
         existingClaim: "pvc-smb-sonarr-tv"

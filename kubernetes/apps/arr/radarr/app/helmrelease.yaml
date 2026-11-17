@@ -31,6 +31,7 @@ spec:
               RADARR__PORT: &port 7878
               RADARR__APPLICATION_URL: "https://radarr.${SECRET_DOMAIN}"
               RADARR__LOG_LEVEL: info
+              RADARR__ALLOWED_HOSTS: "*"
             resources:
               requests:
                 memory: 250Mi
@@ -48,7 +49,7 @@ spec:
       config:
         storageClass: "longhorn"
         accessMode: "ReadWriteOnce"
-        size: 1Gi
+        size: 4Gi
       movies:
         enabled: true
         existingClaim: "pvc-smb-radarr-movies"

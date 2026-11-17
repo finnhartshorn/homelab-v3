@@ -47,7 +47,7 @@ spec:
       config:
         storageClass: "longhorn"
         accessMode: "ReadWriteOnce"
-        size: 1Gi
+        size: 2Gi
     service:
       main:
         controller: main
