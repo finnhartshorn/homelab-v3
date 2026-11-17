@@ -20,6 +20,9 @@ spec:
   values:
     controllers:
       main:
+        annotations:
+          # restart on cert renewal so ghidra reloads the keystore
+          secret.reloader.stakater.com/reload: ghidra-tls
         containers:
           app:
             image:
@@ -27,6 +30,7 @@ spec:
               tag: 12.1.3@sha256:9da0dc3a88b40d4389a06165e1b15672b1f961237f7a1f634ee8f68e83ead3fb
             env:
               TZ: "Australia/Melbourne"
+              # cert-manager (Let's Encrypt) keystore.jks, mounted from the ghidra-tls secret
               GHIDRA_CERT_PATH: "/opt/ghidra/cert"
               GHIDRA_CERT_PASSWORD: ${GHIDRA_CERT_PASSWORD}
               HOSTNAME: "ghidra.${SECRET_DOMAIN}"
@@ -44,12 +48,12 @@ spec:
         #     fsGroupChangePolicy: "OnRootMismatch"
     
     persistence:
-      ghidra-certs:
-        storageClass: "longhorn"
-        accessMode: "ReadWriteOnce"
-        size: 100Mi
+      ghidra-tls:
+        type: secret
+        name: ghidra-tls
         globalMounts:
           - path: /opt/ghidra/cert
+            readOnly: true
       ghidra-repos:
         storageClass: "longhorn"
         accessMode: "ReadWriteOnce"
