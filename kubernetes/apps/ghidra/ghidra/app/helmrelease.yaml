@@ -64,6 +64,9 @@ spec:
       main:
         controller: main
         type: LoadBalancer
+        annotations:
+          # served by k8s-gateway (Services need an explicit hostname)
+          coredns.io/hostname: "ghidra.${SECRET_DOMAIN}"
         ports:
           port1:
             port: 13100

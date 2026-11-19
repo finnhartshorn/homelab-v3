@@ -30,6 +30,16 @@ spec:
       repository: k8s-gateway/k8s_gateway
       tag: 1.8.2
     domain: "${SECRET_DOMAIN}"
+    # AdGuard (both instances) forwards ${SECRET_DOMAIN} here, so keep it up
+    # through a node loss
+    replicaCount: 2
+    topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: k8s-gateway
     ttl: 1
     service:
       type: LoadBalancer
