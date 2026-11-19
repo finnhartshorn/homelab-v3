@@ -54,6 +54,13 @@ spec:
         image:
           reference: ghcr.io/finnhartshorn/timescaledb-cnpg/toolkit:1.23.0-pg18
 
+  # Pin WAL on the primary for each replica so a replica that is down
+  # (node reboot, image roll) can always catch up instead of needing a
+  # WAL segment that was already recycled.
+  replicationSlots:
+    highAvailability:
+      enabled: true
+
   managed:
     roles:
       - name: quizzer
