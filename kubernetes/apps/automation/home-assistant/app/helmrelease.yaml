@@ -56,15 +56,8 @@ spec:
               - path: /
                 pathType: Prefix
     service:
-      nodeport:
-        enabled: true
+      main:
         type: LoadBalancer
-        ports:
-          http:
-            enabled: true
-            port: 8123
-            targetPort: 8123
-            protocol: TCP
     whisper:
       enabled: true
       resources:

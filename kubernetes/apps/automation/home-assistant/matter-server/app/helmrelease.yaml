@@ -25,7 +25,6 @@ spec:
   values:
     persistence:
       size: 2Gi
-      storageClassName: longhorn
     resources:
       requests:
         cpu: 15m
