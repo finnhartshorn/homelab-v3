@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: home-assistant-matter-server
-      version: 4.3.0
+      version: 5.1.0
       sourceRef:
         kind: HelmRepository
         name: derwitt-dev
@@ -24,9 +24,8 @@ spec:
       retries: 3
   values:
     persistence:
-      enabled: true
       size: 2Gi
-      storageClass: longhorn
+      storageClassName: longhorn
     resources:
       requests:
         cpu: 15m
