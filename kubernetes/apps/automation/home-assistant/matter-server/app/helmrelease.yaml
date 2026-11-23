@@ -23,6 +23,12 @@ spec:
     remediation:
       retries: 3
   values:
+    # Pinned to node3: the chart runs on the host network, and commissioning
+    # Thread devices needs an IPv6 route to the Thread prefix. node3 hosts the
+    # OTBR (wpan0), so it has that route directly. Other nodes lack the RA
+    # route-info sysctls and fail with ENETUNREACH.
+    nodeSelector:
+      kubernetes.io/hostname: node3
     persistence:
       size: 2Gi
     resources:
