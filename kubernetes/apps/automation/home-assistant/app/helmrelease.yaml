@@ -23,6 +23,12 @@ spec:
     remediation:
       retries: 3
   values:
+    # Host network so Home Assistant sees LAN multicast (mDNS/SSDP discovery:
+    # Cast, Thread border routers, ...). Cilium does not carry LAN multicast
+    # to pod-network pods. Not pinned to a node: the Deployment is Recreate
+    # and nothing else uses 8123/12321 on the nodes.
+    hostNetwork: true
+    dnsPolicy: ClusterFirstWithHostNet
     image:
       repository: ghcr.io/home-assistant/home-assistant
       tag: 2026.11.2
