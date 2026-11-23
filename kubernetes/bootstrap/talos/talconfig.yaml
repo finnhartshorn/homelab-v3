@@ -91,6 +91,7 @@ nodes:
     controlPlane: true
     patches:
       - "@./patches/node3/machine-usb-serial.yaml"
+      - "@./patches/node3/machine-sysctls-otbr.yaml"
     networkInterfaces:
       - deviceSelector:
           hardwareAddr: "54:bf:64:99:24:42"

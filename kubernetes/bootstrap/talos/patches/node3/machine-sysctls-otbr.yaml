@@ -1,0 +1,12 @@
+machine:
+  # Node-specific: node3 hosts the OpenThread Border Router (OTBR) pod, which
+  # runs on the host network and needs IPv6 forwarding + RA route handling to
+  # route between the Thread mesh and the LAN. Values per the
+  # ownbee/hass-otbr-docker README. disable_ipv6=0 and ipv4 forwarding=1 are
+  # already the live values, so they are not repeated here.
+  # NOTE: sysctls is a map, so talhelper merges this with the global
+  # machine-sysctls.yaml instead of replacing it.
+  sysctls:
+    net.ipv6.conf.all.forwarding: "1"
+    net.ipv6.conf.all.accept_ra: "2"
+    net.ipv6.conf.all.accept_ra_rt_info_max_plen: "64"
