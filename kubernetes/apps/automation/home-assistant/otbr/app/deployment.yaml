@@ -1,0 +1,88 @@
+---
+# OpenThread Border Router for the Home Assistant Connect ZBT-2 (Thread RCP firmware).
+# Pinned to node3, the node the ZBT-2 is plugged into. Home Assistant itself is NOT
+# pinned: it reaches this pod over REST at http://192.168.1.201:8081 (host network).
+#
+# Prerequisites on node3 (Talos): cdc_acm module + udev rules for 303a:831a
+# (patches/node3/machine-usb-serial.yaml) and the IPv6 sysctls from the
+# ownbee/hass-otbr-docker README (accept_ra=2, forwarding, ...).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otbr
+  namespace: home-assistant
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: otbr
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: otbr
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      nodeSelector:
+        kubernetes.io/hostname: node3
+      containers:
+        - name: otbr
+          image: ghcr.io/ownbee/hass-otbr-docker:v0.4.0
+          securityContext:
+            privileged: true
+            capabilities:
+              add:
+                - SYS_ADMIN
+                - NET_ADMIN
+          env:
+            - name: DEVICE
+              value: /dev/ttyOTBR
+            - name: BACKBONE_IF
+              value: eno2
+            - name: BAUDRATE
+              value: "460800"
+            # Unknown whether the ZBT-2 Thread RCP firmware needs hardware flow
+            # control; HA docs say to toggle this if the border router crashes.
+            - name: FLOW_CONTROL
+              value: "0"
+            # Off by default so the container does not rewrite node3's host
+            # iptables/ipsets (Cilium owns them). Enable after the base setup works.
+            - name: FIREWALL
+              value: "0"
+            - name: NAT64
+              value: "0"
+            - name: AUTOFLASH_FIRMWARE
+              value: "0"
+            - name: OTBR_REST_PORT
+              value: "8081"
+            - name: OTBR_WEB_PORT
+              value: "7586"
+            - name: OTBR_LOG_LEVEL
+              value: error
+          volumeMounts:
+            - name: data
+              mountPath: /data/thread
+            - name: rcp
+              mountPath: /dev/ttyOTBR
+            - name: tun
+              mountPath: /dev/net/tun
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: otbr-data
+        - name: rcp
+          hostPath:
+            path: /dev/serial/by-id/usb-Nabu_Casa_ZBT-2_DCB4D90E68C8-if00
+            type: CharDevice
+        - name: tun
+          hostPath:
+            path: /dev/net/tun
+            type: CharDevice
