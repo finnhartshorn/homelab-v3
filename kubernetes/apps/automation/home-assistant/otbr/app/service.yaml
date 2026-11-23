@@ -1,0 +1,17 @@
+---
+# Stable in-cluster address for Home Assistant's OpenThread Border Router
+# integration: http://otbr:8081. The pod is on the host network (node3), so the
+# endpoint is the node IP; moving the dongle only changes the nodeSelector.
+apiVersion: v1
+kind: Service
+metadata:
+  name: otbr
+  namespace: home-assistant
+spec:
+  selector:
+    app.kubernetes.io/name: otbr
+  ports:
+    - name: rest
+      port: 8081
+      targetPort: 8081
+      protocol: TCP
