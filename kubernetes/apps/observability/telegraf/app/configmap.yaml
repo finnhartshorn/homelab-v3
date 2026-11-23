@@ -167,8 +167,13 @@ data:
     [[inputs.prometheus]]
       urls = ["http://192.168.1.211:9182/metrics"]
 
+    # namedrop excludes nvidia_gpu_exporter's clocks_event_reasons_counters_*
+    # *_slowdown_seconds metrics: their names exceed Postgres's 63-byte
+    # identifier limit, so the table can never be created and every flush
+    # logged a permanent write error for them.
     [[inputs.prometheus]]
       urls = ["http://192.168.1.211:9835/metrics"]
+      namedrop = ["nvidia_smi_clocks_event_reasons_counters_*"]
 
     [[inputs.influxdb_v2_listener]]
       service_address = ":8186"

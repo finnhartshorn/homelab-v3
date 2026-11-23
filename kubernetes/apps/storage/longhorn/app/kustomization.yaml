@@ -7,3 +7,4 @@ resources:
   - ./minio-secret.sops.yaml
   - ./recurring-job.yaml
   - ./backup-target.yaml
+  - ./telegraf-metrics-networkpolicy.yaml

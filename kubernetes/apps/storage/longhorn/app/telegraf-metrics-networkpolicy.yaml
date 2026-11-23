@@ -1,0 +1,28 @@
+---
+# Longhorn's chart ships a default-deny-ish NetworkPolicy on longhorn-manager
+# that only admits Longhorn's own components, which silently blocked
+# telegraf's scrape of the manager metrics on :9500 (every scrape hung until
+# the client timeout). NetworkPolicies are additive, so this just adds
+# telegraf as an allowed source for that one port.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: longhorn-manager-metrics-telegraf
+  namespace: longhorn-system
+spec:
+  podSelector:
+    matchLabels:
+      app: longhorn-manager
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: observability
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: telegraf
+      ports:
+        - protocol: TCP
+          port: 9500

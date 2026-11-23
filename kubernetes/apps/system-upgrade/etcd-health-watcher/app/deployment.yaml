@@ -53,8 +53,22 @@ spec:
               SA_DIR=/var/run/secrets/kubernetes.io/serviceaccount
               CA="$SA_DIR/ca.crt"
 
+              # Polled with curl/jq rather than kubectl: every kubectl call is
+              # a fresh Go binary start + TLS handshake, and a 10s loop of ~6
+              # of them kept this pod at ~50m CPU on a control plane that is
+              # otherwise idle. curl against the same endpoints costs a
+              # fraction of that.
+              API=https://kubernetes.default.svc
+              HEARTBEAT=60
+              last_key=""
+              last_write=0
+
               while true; do
-                ips=$(kubectl get nodes -o jsonpath='{range .items[*]}{.status.addresses[?(@.type=="InternalIP")].address}{"\n"}{end}' 2>/dev/null)
+                # Re-read the token every cycle since it's periodically rotated.
+                TOKEN=$(cat "$SA_DIR/token")
+
+                ips=$(curl -sS -m 5 --cacert "$CA" -H "Authorization: Bearer $TOKEN" "$API/api/v1/nodes" 2>/dev/null |
+                  jq -r '.items[]?.status.addresses[]? | select(.type=="InternalIP") | .address' 2>/dev/null)
 
                 if [ -z "$ips" ]; then
                   healthy=false
@@ -62,14 +76,11 @@ spec:
                 else
                   healthy=true
                   detail=""
-                  # --server alone drops the in-cluster CA/token entirely
-                  # (kubectl falls back to interactive auth and hangs on
-                  # EOF) - pass them explicitly so each node is queried with
-                  # the same ServiceAccount identity regardless. Re-read the
-                  # token every cycle since it's periodically rotated.
-                  TOKEN=$(cat "$SA_DIR/token")
+                  # Each node's own kube-apiserver is queried directly (not
+                  # the load-balanced VIP) with the same ServiceAccount
+                  # identity.
                   for ip in $ips; do
-                    out=$(kubectl --request-timeout=5s --server="https://$ip:6443" --certificate-authority="$CA" --token="$TOKEN" get --raw /healthz/etcd 2>&1)
+                    out=$(curl -sS -m 5 --cacert "$CA" -H "Authorization: Bearer $TOKEN" "https://$ip:6443/healthz/etcd" 2>&1)
                     if [ "$out" != "ok" ]; then
                       healthy=false
                       detail="$detail $ip=$out;"
@@ -77,14 +88,23 @@ spec:
                   done
                 fi
 
-                ts=$(date -u +%FT%TZ)
-                kubectl -n "$NS" create configmap "$CM" \
-                  --from-literal=healthy="$healthy" \
-                  --from-literal=checkedAt="$ts" \
-                  --from-literal=detail="$detail" \
-                  --dry-run=client -o yaml | kubectl apply -f - >/dev/null
-
-                echo "### $ts healthy=$healthy${detail:+ detail:$detail}"
+                # Only touch the ConfigMap when the result changes, plus a
+                # periodic heartbeat so checkedAt still shows the watcher is
+                # alive. tuppr only gates on .data.healthy.
+                now=$(date +%s)
+                key="$healthy|$detail"
+                if [ "$key" != "$last_key" ] || [ $((now - last_write)) -ge "$HEARTBEAT" ]; then
+                  ts=$(date -u +%FT%TZ)
+                  if kubectl -n "$NS" create configmap "$CM" \
+                    --from-literal=healthy="$healthy" \
+                    --from-literal=checkedAt="$ts" \
+                    --from-literal=detail="$detail" \
+                    --dry-run=client -o yaml | kubectl apply -f - >/dev/null; then
+                    last_key="$key"
+                    last_write=$now
+                  fi
+                  echo "### $ts healthy=$healthy${detail:+ detail:$detail}"
+                fi
                 sleep 10
               done
           securityContext:
