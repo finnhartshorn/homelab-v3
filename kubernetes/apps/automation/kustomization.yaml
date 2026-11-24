@@ -9,6 +9,7 @@ resources:
   - ./home-assistant/ks.yaml
   - ./home-assistant/piper/ks.yaml
   - ./home-assistant/matter-server/ks.yaml
+  - ./home-assistant/music-assistant/ks.yaml
   - ./home-assistant/otbr/ks.yaml
 components:
   - ../../flux/components/namespace
