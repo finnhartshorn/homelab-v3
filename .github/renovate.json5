@@ -127,7 +127,6 @@
       ],
       matchPackageNames: [
         'prowlarr/prowlarr',
-        'sonarr/sonarr',
         'radarr/radarr',
         'ghcr.io/flaresolverr/flaresolverr',
         'windmill',
