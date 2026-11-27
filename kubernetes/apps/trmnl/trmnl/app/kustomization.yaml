@@ -6,5 +6,6 @@ resources:
   - ./deployment.yaml
   - ./service.yaml
   - ./ingress.yaml
+  - ./secret.sops.yaml
 components:
   - ../../../../flux/components/forgejo-pull-secret
