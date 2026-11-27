@@ -24,7 +24,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: trmnl
-          image: git.finnethen.com/finn/trmnl:v0.2.0
+          image: git.finnethen.com/finn/trmnl:v0.2.1
           ports:
             - name: http
               containerPort: 8080
