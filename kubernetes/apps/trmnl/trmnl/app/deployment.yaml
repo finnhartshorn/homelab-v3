@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trmnl
+  namespace: trmnl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: trmnl
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: trmnl
+    spec:
+      automountServiceAccountToken: false
+      imagePullSecrets:
+        - name: forgejo-registry
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: trmnl
+          image: git.finnethen.com/finn/trmnl:v0.1.0
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          # The port opens only once the screens are rendered.
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 30
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              memory: 256Mi
