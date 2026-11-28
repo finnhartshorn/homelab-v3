@@ -29,7 +29,7 @@ spec:
         kubernetes.io/hostname: node3
       containers:
         - name: otbr
-          image: ghcr.io/ownbee/hass-otbr-docker:v0.4.0
+          image: ghcr.io/ownbee/hass-otbr-docker:v0.5.0
           securityContext:
             privileged: true
             capabilities:
